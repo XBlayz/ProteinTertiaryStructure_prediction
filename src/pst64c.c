@@ -360,9 +360,9 @@ MATRIX backbone(int n, VECTOR phi, VECTOR psi) {
 	type R_C_N  = 1.33;
 
     // Definizione costanti angoli
-	type THETA_CA_C_N = 2.028; // TODO: Non usati ???
+	//type THETA_CA_C_N = 2.028; (Non usati)
 	type THETA_C_N_CA = 2.124;
-	type THETA_N_CA_C = 1.940; // TODO: Non usati ???
+	//type THETA_N_CA_C = 1.940; (Non usati)
 
     // Allocazione matrice (vettore di vettori 3D) risultante
 	MATRIX coords = alloc_matrix(3, n*3);
@@ -465,7 +465,7 @@ type rama_energy(int n, VECTOR phi, VECTOR psi) {
 	type a_phi = -57.8;
 	type a_psi = -47.0;
 	type b_phi = -119.0;
-	type b_psi = 113.0; // TODO: Forse - ???
+	type b_psi = 113.0;
 
 	type energy = 0.0;
 	for(int i=0; i<n; i++) {
@@ -624,7 +624,7 @@ void pst(params* input) {
 				input->e = new_e;
 			}
 			input->phi[i] -= dev_phi;
-			input->psi[i] -= dev_psi; // TODO: Nel DOC è scritto +=
+			input->psi[i] -= dev_psi;
 		}
 
 		// Aggiorno la temperatura
