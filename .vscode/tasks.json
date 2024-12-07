@@ -1,0 +1,134 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // Build ASSEMBLY program
+        {
+            "label": "Build Assembly code",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "command": "nasm",
+            "args": [
+                "-f",
+                "elf64",
+                "pst64.nasm",
+                "-o",
+                "${workspaceFolder}/output/pst64.o"
+            ]
+        },
+
+        // Build C program
+        {
+            "label": "Build C code",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "command": "gcc",
+            "args": [
+                "-Wall",
+                "-pg",
+                "-m64",
+                "-msse",
+                "-mavx",
+                "-O0",
+                "-no-pie",
+                "${workspaceFolder}/output/*64.o",
+                "${file}",
+                "-o",
+                "${workspaceFolder}/output/${fileBasenameNoExtension}",
+                "-lm"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Build Assembly code"
+            ]
+        },
+
+        // Run program
+        {
+            "label": "Run",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/output"
+            },
+            "command": "./${fileBasenameNoExtension}",
+            "args": [
+                "-seq",
+                "${workspaceFolder}/src/input/seq_256.ds2",
+                "-to",
+                "20",
+                "-alpha",
+                "1",
+                "-k",
+                "1",
+                "-sd",
+                "3"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Build C code"
+            ]
+        },
+
+        // Build C test
+        {
+            "label": "Build C test code",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/test"
+            },
+            "command": "gcc",
+            "args": [
+                "-Wall",
+                "${file}",
+                "-o",
+                "build/${fileBasenameNoExtension}",
+                "-lm"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+
+        // Run test
+        {
+            "label": "Test",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/test/build"
+            },
+            "command": "./${fileBasenameNoExtension}",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Build C test code"
+            ]
+        },
+
+        // Profiling
+        {
+            "type": "shell",
+            "label": "Profiling",
+            "options": {
+                "cwd": "${workspaceFolder}/output"
+            },
+            "command": "gprof",
+            "args": [
+                "pst64c",
+                "gmon.out",
+                ">",
+                "profile.txt"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
