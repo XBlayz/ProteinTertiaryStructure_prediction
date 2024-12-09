@@ -18,5 +18,8 @@ add_library(pst64asm OBJECT ${src_asm})
 add_executable(pst64c pst64c.c ${pst64asm})
 
 # Setup GCC
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pg -m64 -msse -mavx -O0 -no-pie")
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pg")
+endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64 -msse -mavx -O0 -no-pie")
 target_link_libraries(pst64c m)
