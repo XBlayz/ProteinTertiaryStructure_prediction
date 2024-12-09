@@ -802,9 +802,9 @@ int main(int argc, char** argv) {
 	//
 	// Salva il risultato
 	//
-	sprintf(fname_phi, "out32_%d_%d_phi.ds2", input->N, input->sd);
+	sprintf(fname_phi, "out64_%d_%d_phi.ds2", input->N, input->sd);
 	save_out(fname_phi, input->phi, input->N);
-	sprintf(fname_psi, "out32_%d_%d_psi.ds2", input->N, input->sd);
+	sprintf(fname_psi, "out64_%d_%d_psi.ds2", input->N, input->sd);
 	save_out(fname_psi, input->psi, input->N);
 	if(input->display){
 		if(input->phi == NULL || input->psi == NULL)
