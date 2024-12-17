@@ -1,7 +1,7 @@
 /**************************************************************************************
 *
 * CdL Magistrale in Ingegneria Informatica
-* Corso di Architetture e Programmazione dei Sistemi di Elaborazione - a.a. 2020/21
+* Corso di Architetture e Programmazione dei Sistemi di Elaborazione - a.a. 2024/25
 *
 * Progetto dell'algoritmo Predizione struttura terziaria proteine 221 231 a
 * in linguaggio assembly x86-64 + SSE
@@ -47,6 +47,7 @@
 #include <libgen.h>
 #include <xmmintrin.h>
 
+//! Definizione della costante M_PI se non definito
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -62,18 +63,18 @@ type volume[] = {88.6, -1, 108.5, 111.1, 138.4, 189.9, 60.1, 153.2, 166.7, -1, 1
 type charge[] = {0, -1, 0, -1, -1, 0, 0, 0.5, 0, -1, 1, 0, 0, 0, -1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, -1};
 
 typedef struct {
-	char* seq;		// sequenza di amminoacidi
-	int N;		// lunghezza sequenza
-	unsigned int sd; 	// seed per la generazione	casuale
-	type to;		// temperatura INIZIALE
-	type alpha;		// tasso di raffredamento
-	type k;			// costante
-	VECTOR hydrophobicity; // hydrophobicity
-	VECTOR volume;		// volume
-	VECTOR charge;		// charge
-	VECTOR phi;		// vettore angoli phi
-	VECTOR psi;		// vettore angoli psi
-	type e;		// energy
+	char* seq;					// sequenza di amminoacidi
+	int N;						// lunghezza sequenza
+	unsigned int sd; 			// seed per la generazione	casuale
+	type to;					// temperatura INIZIALE
+	type alpha;					// tasso di raffredamento
+	type k;						// costante
+	VECTOR hydrophobicity; 		// hydrophobicity
+	VECTOR volume;				// volume
+	VECTOR charge;				// charge
+	VECTOR phi;					// vettore angoli phi
+	VECTOR psi;					// vettore angoli psi
+	type e;						// energy
 	int display;
 	int silent;
 } params;
@@ -138,7 +139,7 @@ void dealloc_matrix(void* mat) {
 */
 MATRIX load_data(char* filename, int *n, int *k) {
 	FILE* fp;
-	int rows, cols; //* i, status (NON USATI)
+	int rows, cols; //! i, status (NON USATI)
 
 	fp = fopen(filename, "rb");
 
@@ -147,11 +148,11 @@ MATRIX load_data(char* filename, int *n, int *k) {
 		exit(0);
 	}
 
-	fread(&cols, sizeof(int), 1, fp); //* status = ...
-	fread(&rows, sizeof(int), 1, fp); //* status = ...
+	fread(&cols, sizeof(int), 1, fp); //! status = ...
+	fread(&rows, sizeof(int), 1, fp); //! status = ...
 
 	MATRIX data = alloc_matrix(rows,cols);
-	fread(data, sizeof(type), rows*cols, fp); //* status = ...
+	fread(data, sizeof(type), rows*cols, fp); //! status = ...
 	fclose(fp);
 
 	*n = rows;
@@ -181,7 +182,7 @@ MATRIX load_data(char* filename, int *n, int *k) {
 */
 char* load_seq(char* filename, int *n, int *k) {
 	FILE* fp;
-	int rows, cols; //* i, status (NON USATI)
+	int rows, cols; //! i, status (NON USATI)
 
 	fp = fopen(filename, "rb");
 
@@ -190,12 +191,12 @@ char* load_seq(char* filename, int *n, int *k) {
 		exit(0);
 	}
 
-	fread(&cols, sizeof(int), 1, fp); //* status = ...
-	fread(&rows, sizeof(int), 1, fp); //* status = ...
+	fread(&cols, sizeof(int), 1, fp); //! status = ...
+	fread(&rows, sizeof(int), 1, fp); //! status = ...
 
 
 	char* data = alloc_char_matrix(rows,cols);
-	fread(data, sizeof(char), rows*cols, fp); //* status = ...
+	fread(data, sizeof(char), rows*cols, fp); //! status = ...
 	fclose(fp);
 
 	*n = rows;
@@ -250,7 +251,7 @@ void save_data(char* filename, void* X, int n, int k) {
 */
 void save_out(char* filename, MATRIX X, int k) {
 	FILE* fp;
-	//* int i (NON USATO)
+	//! int i (NON USATO)
 	int n = 1;
 	fp = fopen(filename, "wb");
 	if(X != NULL){
@@ -280,11 +281,15 @@ void gen_rnd_mat(VECTOR v, int N){
 
 // PROCEDURE ASSEMBLY
 extern void prova(params* input);
+//TODO: extern void sum_quad(VECTOR v, type* r);
 
 // --ROTATION--
 // -UTILITY-
 type modulo(VECTOR v) {
     // Modulo di un vettore 3D
+	type r = 0;
+	//TODO: sum_quad(v, &r);
+	//TODO: return sqrt(r);
 	return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
@@ -462,6 +467,7 @@ MATRIX backbone(int n, VECTOR phi, VECTOR psi) {
 // --RAMA-ENERGY--
 // -MAIN-
 type rama_energy(int n, VECTOR phi, VECTOR psi) {
+	// Definizione costanti funzione
 	type a_phi = -57.8;
 	type a_psi = -47.0;
 	type b_phi = -119.0;
@@ -479,6 +485,7 @@ type rama_energy(int n, VECTOR phi, VECTOR psi) {
 		tmp[2] = 0;
 		type b = modulo(tmp);
 		dealloc_matrix(tmp);
+		// Calcolo energia
 		energy += 0.5 * (a<b ? a : b);
 	}
 	return energy;
@@ -487,6 +494,7 @@ type rama_energy(int n, VECTOR phi, VECTOR psi) {
 // --HYDROPHOBIC-ENERGY--
 // -UTILITY-
 type dist(VECTOR i, VECTOR j) {
+	// Calcolo distanza tra due vettori 3D
 	VECTOR tmp = alloc_matrix(3, 1);
 	tmp[0] = j[0]-i[0];
 	tmp[1] = j[1]-i[1];
@@ -504,10 +512,12 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 	for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
+			// Indicizzazione atomi Ca [(i*3)+1]
 			vi[0] = coords[((i*3)+1)*3];
 			vi[1] = coords[((i*3)+1)*3+1];
 			vi[2] = coords[((i*3)+1)*3+2];
 			VECTOR vj = alloc_matrix(3, 1);
+			// Indicizzazione atomi Ca [(i*3)+1]
 			vj[0] = coords[((j*3)+1)*3];
 			vj[1] = coords[((j*3)+1)*3+1];
 			vj[2] = coords[((j*3)+1)*3+2];
@@ -516,6 +526,7 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 			dealloc_matrix(vj);
 
 			if(d < 10.0) {
+				// Calcolo energia
 				energy += (hydrophobicity[s[i]-'a'] * hydrophobicity[s[j]-'a']) / d;
 			}
 		}
@@ -531,10 +542,12 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 	for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
+			// Indicizzazione atomi Ca [(i*3)+1]
 			vi[0] = coords[((i*3)+1)*3];
 			vi[1] = coords[((i*3)+1)*3+1];
 			vi[2] = coords[((i*3)+1)*3+2];
 			VECTOR vj = alloc_matrix(3, 1);
+			// Indicizzazione atomi Ca [(i*3)+1]
 			vj[0] = coords[((j*3)+1)*3];
 			vj[1] = coords[((j*3)+1)*3+1];
 			vj[2] = coords[((j*3)+1)*3+2];
@@ -543,6 +556,7 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 			dealloc_matrix(vj);
 
 			if(i != j && d < 10.0 && charge[s[i]-'a'] != 0 && charge[s[j]-'a'] != 0) {
+				// Calcolo energia
 				energy += (charge[s[i]-'a'] * charge[s[j]-'a']) / (d*4.0);
 			}
 		}
@@ -559,10 +573,12 @@ type packing_energy(char* s, int n, MATRIX coords) {
 		type density = 0;
 		for(int j = 0; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
+			// Indicizzazione atomi Ca [(i*3)+1]
 			vi[0] = coords[((i*3)+1)*3];
 			vi[1] = coords[((i*3)+1)*3+1];
 			vi[2] = coords[((i*3)+1)*3+2];
 			VECTOR vj = alloc_matrix(3, 1);
+			// Indicizzazione atomi Ca [(i*3)+1]
 			vj[0] = coords[((j*3)+1)*3];
 			vj[1] = coords[((j*3)+1)*3+1];
 			vj[2] = coords[((j*3)+1)*3+2];
@@ -571,9 +587,11 @@ type packing_energy(char* s, int n, MATRIX coords) {
 			dealloc_matrix(vj);
 
 			if(i != j && d < 10.0) {
+				// Calcolo densità
 				density += volume[s[j]-'a'] / (d*d*d);
 			}
 		}
+		// Calcolo energia
 		type tmp = volume[s[i]-'a'] - density;
 		energy += tmp*tmp;
 	}
@@ -583,18 +601,25 @@ type packing_energy(char* s, int n, MATRIX coords) {
 // --ENERGY--
 // -MAIN-
 type energy(char* s, int n, VECTOR phi, VECTOR psi) {
+	// Calcolo vettore delle coordinate del backbone
 	MATRIX coords = backbone(n, phi, psi);
 
+	// Calcolo delle energie
 	type rama = rama_energy(n, phi, psi);
 	type hydro = hydrophobic_energy(s, n, coords);
 	type elec = electrostatic_energy(s, n, coords);
 	type pack = packing_energy(s, n, coords);
 
+	// Deallocazione
+	dealloc_matrix(coords);
+
+	// Definizione pesi delle energie
 	type w_rama = 1.0;
 	type w_hydro = 0.5;
 	type w_elec = 0.2;
 	type w_pack = 0.3;
 
+	// Somma pesata delle energie
 	return w_rama*rama + w_hydro*hydro + w_elec*elec + w_pack*pack;
 }
 
@@ -783,7 +808,7 @@ int main(int argc, char** argv) {
 	}
 
 	// COMMENTARE QUESTA RIGA!
-	//prova(input);
+	// prova(input);
 	//
 
 	//
@@ -810,7 +835,7 @@ int main(int argc, char** argv) {
 		if(input->phi == NULL || input->psi == NULL)
 			printf("out: NULL\n");
 		else{
-			int i; //* j (NON USATO)
+			int i; //! j (NON USATO)
 			printf("energy: %f, phi: [", input->e);
 			for(i=0; i<input->N; i++){
 				printf("%f,", input->phi[i]);

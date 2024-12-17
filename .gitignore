@@ -1,6 +1,13 @@
-*.db
+*.o
 *.out
-profile.txt
+out*.ds2
+
+pst64
+pst64_debug
+pst64_omp
+pst64_omp_debug
+pst32
+pst32_debug
 
 build/
 .vscode/

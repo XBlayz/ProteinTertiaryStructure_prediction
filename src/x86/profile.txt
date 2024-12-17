@@ -1,0 +1,314 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 14.81      0.44     0.44 52457617     0.00     0.00  hydrophobic_energy
+ 12.79      0.82     0.38                             register_tm_clones
+  9.43      1.10     0.28 53276862     0.00     0.00  cos_and_sin
+  8.92      1.36     0.27      401     0.66     1.72  packing_energy
+  8.75      1.62     0.26      401     0.65     1.64  electrostatic_energy
+  8.59      1.88     0.26                             energy
+  7.41      2.10     0.22 158397008     0.00     0.00  load_data
+  5.39      2.26     0.16 158397007     0.00     0.00  alloc_char_matrix
+  5.39      2.42     0.16 158397007     0.00     0.00  dealloc_matrix
+  4.38      2.55     0.13 158397008     0.00     0.00  alloc_int_matrix
+  4.38      2.68     0.13 158397007     0.00     0.00  alloc_matrix
+  2.19      2.75     0.07                             _mm_free
+  2.19      2.81     0.07                             get_block
+  2.02      2.87     0.06   307166     0.00     0.00  rotation
+  1.68      2.92     0.05 158397008     0.00     0.00  _mm_malloc
+  0.67      2.94     0.02                             _init
+  0.67      2.96     0.02                             free_block
+  0.34      2.97     0.01                             prodotto_vet_mat
+  0.00      2.97     0.00      401     0.00     0.17  backbone
+  0.00      2.97     0.00      401     0.00     3.52  pst
+  0.00      2.97     0.00      401     0.00     0.00  rama_energy
+  0.00      2.97     0.00        2     0.00     0.00  gen_rnd_mat
+  0.00      2.97     0.00        1     0.00     0.00  load_seq
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.34% of 2.97 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     47.5    0.00    1.41                 main [1]
+                0.00    1.41     401/401         pst [2]
+                0.00    0.00       2/53276862     cos_and_sin [10]
+                0.00    0.00       2/158397007     dealloc_matrix [12]
+                0.00    0.00       2/2           gen_rnd_mat [26]
+                0.00    0.00       1/1           load_seq [27]
+-----------------------------------------------
+                                   1             pst [2]
+                0.00    1.41     401/401         main [1]
+[2]     47.5    0.00    1.41     401+1       pst [2]
+                0.27    0.42     401/401         packing_energy [6]
+                0.26    0.40     401/401         electrostatic_energy [7]
+                0.00    0.07     401/401         backbone [14]
+                0.00    0.00     401/401         rama_energy [23]
+                0.00    0.00     401/52457617     hydrophobic_energy [3]
+                0.00    0.00     401/158397008     load_data [5]
+                                   1             pst [2]
+-----------------------------------------------
+                0.00    0.00     401/52457617     pst [2]
+                0.11    0.15 13088640/52457617     electrostatic_energy [7]
+                0.11    0.15 13088640/52457617     packing_energy [6]
+                0.22    0.29 26279936/52457617     energy [4]
+[3]     34.5    0.44    0.58 52457617         hydrophobic_energy [3]
+                0.28    0.00 52559872/53276862     cos_and_sin [10]
+                0.07    0.16 52559872/158397008     load_data [5]
+                0.08    0.00 78634496/158397007     dealloc_matrix [12]
+-----------------------------------------------
+                                                 <spontaneous>
+[4]     33.6    0.26    0.74                 energy [4]
+                0.22    0.29 26279936/52457617     hydrophobic_energy [3]
+                0.07    0.16 52559872/158397008     load_data [5]
+-----------------------------------------------
+                0.00    0.00       1/158397008     save_data [25]
+                0.00    0.00       2/158397008     _fini [24]
+                0.00    0.00     401/158397008     pst [2]
+                0.00    0.00  103458/158397008     rama_energy [23]
+                0.00    0.00  307166/158397008     rotation [17]
+                0.00    0.00  511676/158397008     backbone [14]
+                0.04    0.08 26177280/158397008     electrostatic_energy [7]
+                0.04    0.08 26177280/158397008     packing_energy [6]
+                0.07    0.16 52559872/158397008     hydrophobic_energy [3]
+                0.07    0.16 52559872/158397008     energy [4]
+[5]     23.2    0.22    0.47 158397008         load_data [5]
+                0.16    0.13 158397007/158397007     alloc_char_matrix [9]
+                0.13    0.05 158397008/158397008     alloc_int_matrix [11]
+-----------------------------------------------
+                0.27    0.42     401/401         pst [2]
+[6]     23.2    0.27    0.42     401         packing_energy [6]
+                0.11    0.15 13088640/52457617     hydrophobic_energy [3]
+                0.04    0.08 26177280/158397008     load_data [5]
+                0.05    0.00 52559872/158397007     dealloc_matrix [12]
+-----------------------------------------------
+                0.26    0.40     401/401         pst [2]
+[7]     22.1    0.26    0.40     401         electrostatic_energy [7]
+                0.11    0.15 13088640/52457617     hydrophobic_energy [3]
+                0.04    0.08 26177280/158397008     load_data [5]
+                0.03    0.00 26177280/158397007     dealloc_matrix [12]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]     12.8    0.38    0.00                 register_tm_clones [8]
+-----------------------------------------------
+                0.16    0.13 158397007/158397007     load_data [5]
+[9]      9.8    0.16    0.13 158397007         alloc_char_matrix [9]
+                0.13    0.00 158397007/158397007     alloc_matrix [13]
+-----------------------------------------------
+                0.00    0.00       2/53276862     main [1]
+                0.00    0.00  102656/53276862     dist [22]
+                0.00    0.00  307166/53276862     rotation [17]
+                0.00    0.00  307166/53276862     backbone [14]
+                0.28    0.00 52559872/53276862     hydrophobic_energy [3]
+[10]     9.4    0.28    0.00 53276862         cos_and_sin [10]
+-----------------------------------------------
+                0.13    0.05 158397008/158397008     load_data [5]
+[11]     6.1    0.13    0.05 158397008         alloc_int_matrix [11]
+                0.05    0.00 158397008/158397008     _mm_malloc [18]
+-----------------------------------------------
+                0.00    0.00       2/158397007     main [1]
+                0.00    0.00  102656/158397007     dist [22]
+                0.00    0.00  308369/158397007     backbone [14]
+                0.00    0.00  614332/158397007     rotation [17]
+                0.03    0.00 26177280/158397007     electrostatic_energy [7]
+                0.05    0.00 52559872/158397007     packing_energy [6]
+                0.08    0.00 78634496/158397007     hydrophobic_energy [3]
+[12]     5.4    0.16    0.00 158397007         dealloc_matrix [12]
+-----------------------------------------------
+                0.13    0.00 158397007/158397007     alloc_char_matrix [9]
+[13]     4.4    0.13    0.00 158397007         alloc_matrix [13]
+-----------------------------------------------
+                              307166             backbone [14]
+                0.00    0.07     401/401         pst [2]
+[14]     2.3    0.00    0.07     401+307166  backbone [14]
+                0.06    0.00  307166/307166      rotation [17]
+                0.00    0.00  511676/158397008     load_data [5]
+                0.00    0.00  307166/53276862     cos_and_sin [10]
+                0.00    0.00  308369/158397007     dealloc_matrix [12]
+                              307166             backbone [14]
+-----------------------------------------------
+                                                 <spontaneous>
+[15]     2.2    0.07    0.00                 get_block [15]
+-----------------------------------------------
+                                                 <spontaneous>
+[16]     2.2    0.07    0.00                 _mm_free [16]
+-----------------------------------------------
+                              307166             rotation [17]
+                0.06    0.00  307166/307166      backbone [14]
+[17]     2.1    0.06    0.00  307166+307166  rotation [17]
+                0.00    0.00  307166/53276862     cos_and_sin [10]
+                0.00    0.00  307166/158397008     load_data [5]
+                0.00    0.00  614332/158397007     dealloc_matrix [12]
+                              307166             rotation [17]
+-----------------------------------------------
+                0.05    0.00 158397008/158397008     alloc_int_matrix [11]
+[18]     1.7    0.05    0.00 158397008         _mm_malloc [18]
+-----------------------------------------------
+                                                 <spontaneous>
+[19]     0.7    0.02    0.00                 free_block [19]
+-----------------------------------------------
+                                                 <spontaneous>
+[20]     0.7    0.02    0.00                 _init [20]
+-----------------------------------------------
+                                                 <spontaneous>
+[21]     0.3    0.01    0.00                 prodotto_vet_mat [21]
+-----------------------------------------------
+                                                 <spontaneous>
+[22]     0.0    0.00    0.00                 dist [22]
+                0.00    0.00  102656/53276862     cos_and_sin [10]
+                0.00    0.00  102656/158397007     dealloc_matrix [12]
+-----------------------------------------------
+                0.00    0.00     401/401         pst [2]
+[23]     0.0    0.00    0.00     401         rama_energy [23]
+                0.00    0.00  103458/158397008     load_data [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[24]     0.0    0.00    0.00                 _fini [24]
+                0.00    0.00       2/158397008     load_data [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[25]     0.0    0.00    0.00                 save_data [25]
+                0.00    0.00       1/158397008     load_data [5]
+-----------------------------------------------
+                0.00    0.00       2/2           main [1]
+[26]     0.0    0.00    0.00       2         gen_rnd_mat [26]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[27]     0.0    0.00    0.00       1         load_seq [27]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [20] _init                  [12] dealloc_matrix         [27] load_seq
+  [16] _mm_free                [7] electrostatic_energy    [6] packing_energy
+  [18] _mm_malloc              [4] energy                 [21] prodotto_vet_mat
+   [9] alloc_char_matrix      [19] free_block              [2] pst
+  [11] alloc_int_matrix       [26] gen_rnd_mat            [23] rama_energy
+  [13] alloc_matrix           [15] get_block               [8] register_tm_clones
+  [14] backbone                [3] hydrophobic_energy     [17] rotation
+  [10] cos_and_sin             [5] load_data
