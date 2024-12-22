@@ -281,15 +281,12 @@ void gen_rnd_mat(VECTOR v, int N){
 
 // PROCEDURE ASSEMBLY
 extern void prova(params* input);
-//TODO: extern void sum_quad(VECTOR v, type* r);
 
 // --ROTATION--
 // -UTILITY-
 type modulo(VECTOR v) {
+	//TODO: Assembly
     // Modulo di un vettore 3D
-	type r = 0;
-	//TODO: sum_quad(v, &r);
-	//TODO: return sqrt(r);
 	return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
@@ -494,6 +491,7 @@ type rama_energy(int n, VECTOR phi, VECTOR psi) {
 // --HYDROPHOBIC-ENERGY--
 // -UTILITY-
 type dist(VECTOR i, VECTOR j) {
+	//TODO: Assembly
 	// Calcolo distanza tra due vettori 3D
 	VECTOR tmp = alloc_matrix(3, 1);
 	tmp[0] = j[0]-i[0];
@@ -507,6 +505,7 @@ type dist(VECTOR i, VECTOR j) {
 
 // -MAIN-
 type hydrophobic_energy(char* s, int n, MATRIX coords) {
+	//TODO: Assembly
 	type energy = 0;
 
 	for(int i = 0; i<n; i++) {
@@ -537,6 +536,7 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 // --ELECTROSTATIC-ENERGY--
 // -MAIN-
 type electrostatic_energy(char* s, int n, MATRIX coords) {
+	//TODO: Assembly
 	type energy = 0;
 
 	for(int i = 0; i<n; i++) {
@@ -567,6 +567,7 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 // --PACKING-ENERGY--
 // -MAIN-
 type packing_energy(char* s, int n, MATRIX coords) {
+	//TODO: Assembly
 	type energy = 0;
 
 	for(int i = 0; i<n; i++) {
@@ -578,7 +579,7 @@ type packing_energy(char* s, int n, MATRIX coords) {
 			vi[1] = coords[((i*3)+1)*3+1];
 			vi[2] = coords[((i*3)+1)*3+2];
 			VECTOR vj = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(i*3)+1]
+			// Indicizzazione atomi Ca [(j*3)+1]
 			vj[0] = coords[((j*3)+1)*3];
 			vj[1] = coords[((j*3)+1)*3+1];
 			vj[2] = coords[((j*3)+1)*3+2];
@@ -630,6 +631,7 @@ void pst(params* input) {
 
 	int t = 0;
 	do {
+		//! int i = random() * input->N;
 		int i = rand() % input->N;
 		type dev_phi = (random()*2 * M_PI) - M_PI;
 		type dev_psi = (random()*2 * M_PI) - M_PI;
@@ -642,7 +644,7 @@ void pst(params* input) {
 		if(delta_e <= 0) {
 			input->e = new_e;
 		} else {
-			type p = exp(-delta_e / (input->k * temperatura));
+			type p = exp(-1*(delta_e / (input->k * temperatura)));
 			type r = random();
 
 			if(r <= p) {
