@@ -281,12 +281,20 @@ void gen_rnd_mat(VECTOR v, int N){
 
 // PROCEDURE ASSEMBLY
 extern void prova(params* input);
+extern void sum_quad(VECTOR v, type* r); // r = v[0]*v[0] + v[1]*v[1] + v[2]*v[2]
 
 // --ROTATION--
 // -UTILITY-
 type modulo(VECTOR v) {
-	//TODO: Assembly
-    // Modulo di un vettore 3D
+	// Modulo di un vettore 3D
+
+	//* ASSEMBLY
+	/* type r = 0;
+	sum_quad(v, &r);
+
+	return sqrt(r); */
+
+	//* C
 	return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
@@ -491,7 +499,6 @@ type rama_energy(int n, VECTOR phi, VECTOR psi) {
 // --HYDROPHOBIC-ENERGY--
 // -UTILITY-
 type dist(VECTOR i, VECTOR j) {
-	//TODO: Assembly
 	// Calcolo distanza tra due vettori 3D
 	VECTOR tmp = alloc_matrix(3, 1);
 	tmp[0] = j[0]-i[0];
@@ -566,11 +573,16 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 
 // --PACKING-ENERGY--
 // -MAIN-
+extern void p_energy(char* s, int n, MATRIX coords, type* e);
+
 type packing_energy(char* s, int n, MATRIX coords) {
-	//TODO: Assembly
 	type energy = 0;
 
-	for(int i = 0; i<n; i++) {
+	//* ASSEMBLY
+	p_energy(s, n, coords, &energy);
+
+	//* C
+	/* for(int i = 0; i<n; i++) {
 		type density = 0;
 		for(int j = 0; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
@@ -595,7 +607,7 @@ type packing_energy(char* s, int n, MATRIX coords) {
 		// Calcolo energia
 		type tmp = volume[s[i]-'a'] - density;
 		energy += tmp*tmp;
-	}
+	} */
 	return energy;
 }
 
