@@ -281,10 +281,11 @@ void gen_rnd_mat(VECTOR v, int N){
 
 // PROCEDURE ASSEMBLY
 extern void prova(params* input);
-extern void sum_quad(VECTOR v, type* r); // r = v[0]*v[0] + v[1]*v[1] + v[2]*v[2]
 
 // --ROTATION--
 // -UTILITY-
+extern void sum_quad(VECTOR v, type* r); // r = v[0]*v[0] + v[1]*v[1] + v[2]*v[2]
+
 type modulo(VECTOR v) {
 	// Modulo di un vettore 3D
 
@@ -573,13 +574,13 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 
 // --PACKING-ENERGY--
 // -MAIN-
-extern void p_energy(char* s, int n, MATRIX coords, type* e);
+extern void p_energy(char* s, int n, MATRIX coords, type* e, type* v);
 
 type packing_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
 
 	//* ASSEMBLY
-	p_energy(s, n, coords, &energy);
+	p_energy(s, n, coords, &energy, volume);
 
 	//* C
 	/* for(int i = 0; i<n; i++) {

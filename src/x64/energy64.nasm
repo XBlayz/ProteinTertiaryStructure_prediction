@@ -1,0 +1,162 @@
+%include "sseutils64.nasm"
+
+section .data			; Sezione contenente dati inizializzati
+int_fmt db '%d', 0
+msgNl	db  0x0a, 0
+
+section .bss			; Sezione contenente dati non inizializzati
+alignb  32
+ePointer	resq    1
+
+section .text			; Sezione contenente il codice macchina
+
+extern get_block
+extern free_block
+
+%macro	getmem	2
+	mov	rdi, %1
+	mov	rsi, %2
+	call	get_block
+%endmacro
+
+%macro	fremem	1
+	mov	rdi, %1
+	call	free_block
+%endmacro
+
+%macro iprint 1
+    pushaq                      ; Save all registers
+    mov rdi, int_fmt            ; Load format string into rdi
+    mov rsi, %1                 ; Load the integer value into rsi
+    xor rax, rax                ; Clear rax as required by printf
+    call printf                 ; Call printf
+    popaq                       ; Restore all registers
+
+	prints msgNl
+%endmacro
+
+%macro vprint 2
+	prints %1
+	iprint %2
+%endmacro
+
+; ------------------------------------------------------------
+; Funzione p_energy
+; ------------------------------------------------------------
+global p_energy
+
+mask	dq	0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0x0
+ten		dq	10.0
+msgOk	db  'ok', 10, 0
+msgI	db  'i:', 0
+msgJ	db  'j:', 0
+msgIx	db  'ix:', 0
+msgJx	db  'jx:', 0
+msgX	db  'x:', 0
+
+p_energy:
+	; ------------------------------------------------------------
+	; Sequenza di ingresso nella funzione
+	; ------------------------------------------------------------
+		push		rbp				; salva il Base Pointer
+		mov		rbp, rsp			; il Base Pointer punta al Record di Attivazione corrente
+		pushaq						; salva i registri generali
+
+	; ------------------------------------------------------------
+	; Funzione
+	; ------------------------------------------------------------
+		; RDI: *s, RSI: n, RDX: *coords, RCX: *e, R8: *volume
+		MOV			[ePointer], RCX			; ePointer = *e
+		MOV			R11, R8					; R11: *volume
+		XOR 		R8, R8					; R8: i=0
+		XOR			R9, R9					; R9: j=0
+		VXORPD		XMM0, XMM0				; XMM0: | 0 | density=0 |
+		VXORPD		XMM7, XMM7				; XMM7: | 0 | energy=0 |
+
+		MOV			R10, 3*8				; R10 = 3*8
+start_loop_i:
+		; if (i < n)
+		CMP			R8, RSI
+		JGE			end_i_loop
+
+		MOV			RAX, 3					; RAX = 3
+		IMUL		RAX, R8					; RAX = i*3
+		ADD			RAX, 1					; RAX = i*3 + 1 //Atomo Ca
+		IMUL		RAX, R10				; RAX = (i*3 + 1)*3*8 //Coordinata
+
+start_loop_j:
+		; if (j < n)
+		CMP			R9, RSI
+		JGE			end_j_loop
+		; if (i == j)
+		CMP			R8, R9
+		JE			loop_j
+
+		MOV			RCX, 3					; RCX = 3
+		IMUL		RCX, R9					; RCX = j*3
+		ADD			RCX, 1					; RCX = j*3 + 1 //Atomo Ca
+		IMUL		RCX, R10				; RCX = (j*3 + 1)*3*8 //Coordinata
+
+		; v[i]
+		VMOVUPD			XMM1, [RDX+RAX]				; XMM1 <- v[(i*3 + 1)*3], v[(i*3 + 1)*3+1]
+		VMOVSD			XMM2, [RDX+RAX+16]			; XMM2 <- v[(i*3 + 1)*3+2]
+		VPERM2F128		YMM1, YMM1, YMM2, 0x20		; YMM1 <- | xxx | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VANDPD			YMM1, YMM1, [mask]			; YMM1 <- |  0  | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		; v[j]
+		VMOVUPD			XMM2, [RDX+RCX]				; XMM2 <- v[(j*3 + 1)*3], v[(j*3 + 1)*3+1]
+		VMOVSD			XMM3, [RDX+RCX+16]			; XMM3 <- v[(j*3 + 1)*3+2]
+		VPERM2F128		YMM2, YMM2, YMM3, 0x20		; YMM2 <- | xxx | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- |  0  | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+
+		VSUBPD			YMM1, YMM2, YMM1			; YMM1 <- | v[(j*3 + 1)*3] - v[(i*3 + 1)*3] | v[(j*3 + 1)*3+1] - v[(i*3 + 1)*3+1] | v[(j*3 + 1)*3+2] - v[(i*3 + 1)*3+2] |
+
+		VMULPD			YMM1, YMM1, YMM1
+		VPERM2F128		YMM2, YMM1, YMM1, 0x01
+		VADDPD			XMM1, XMM1, XMM2
+		VPERMILPD 		XMM2, XMM1, 0x03
+		VADDPD			XMM1, XMM1, XMM2
+		VSQRTSD			XMM1, XMM1, XMM1
+
+		; if (d >= 10.0)
+		VMOVSD			XMM4, [ten]
+		VCMPSD			XMM5, XMM1, XMM4, 5
+		MOVMSKPD		RCX, XMM5
+		CMP				RCX, 0
+		JG				loop_j
+
+		; CALCOLA DENSITà
+		VMULSD			XMM2, XMM1, XMM1			; XMM2 = d^2
+		VMULSD			XMM2, XMM2, XMM1			; XMM2 = d^3
+		XOR				RAX, RAX					; RAX = 0
+		MOV				AL, [RDI+R9]				; AL = s[j]
+		SUB				AL, 97						; AL = s[j]-'a'
+		VMOVSD			XMM3, [R11+RAX]				; XMM3 = volume[s[j]-'a']
+		VDIVSD			XMM3, XMM3, XMM2			; XMM3 = volume[s[j]-'a'] / d^3
+		VADDSD			XMM0, XMM0, XMM3			; XMM0 += volume[s[j]-'a'] / d^3
+
+loop_j:
+		INC 	R9				; j++
+		JMP		start_loop_j
+
+end_j_loop:
+		XOR				RAX, RAX					; RAX = 0
+		MOV				AL, [RDI+R9]				; AL = s[j]
+		SUB				AL, 97						; AL = s[j]-'a'
+		VMOVSD			XMM3, [R11+RAX]				; XMM3 = volume[s[j]-'a']
+		VSUBSD			XMM3, XMM3, XMM0			; XMM3 = volume[s[j]-'a'] - XMM0
+		VMULSD			XMM3, XMM3, XMM3			; XMM3 = (volume[s[j]-'a'] - XMM0)^2
+		VADDSD			XMM7, XMM7, XMM3			; XMM7 += (volume[s[j]-'a'] - XMM0)^2
+loop_i:
+		INC 	R8				; i++
+		JMP		start_loop_i
+
+end_i_loop:
+		MOV				RCX, [ePointer]
+		VMOVSD			[RCX], XMM7					; e = XMM7
+	; ------------------------------------------------------------
+	; Sequenza di uscita dalla funzione
+	; ------------------------------------------------------------
+		popaq				; ripristina i registri generali
+		mov		rsp, rbp	; ripristina lo Stack Pointer
+		pop		rbp		    ; ripristina il Base Pointer
+		ret				    ; torna alla funzione C chiamante

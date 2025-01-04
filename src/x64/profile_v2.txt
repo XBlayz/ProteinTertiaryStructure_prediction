@@ -1,8 +1,8 @@
-Flat profile:
+Flat profile: Funzione "modulo" ottimizzata in assembly
 
 Each sample counts as 0.01 seconds.
-  %   cumulative   self              self     total           
- time   seconds   seconds    calls   s/call   s/call  name    
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls   s/call   s/call  name
  51.72      2.41     2.41 53276860     0.00     0.00  modulo
   9.87      2.87     0.46                             sum_quad
   9.66      3.32     0.45      401     0.00     0.01  packing_energy
