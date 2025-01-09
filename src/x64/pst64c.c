@@ -543,11 +543,16 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 
 // --ELECTROSTATIC-ENERGY--
 // -MAIN-
+extern void e_energy(char* s, int n, MATRIX coords, type* e, type* c);
+
 type electrostatic_energy(char* s, int n, MATRIX coords) {
-	//TODO: Assembly
 	type energy = 0;
 
-	for(int i = 0; i<n; i++) {
+	//* ASSEMBLY
+	e_energy(s, n, coords, &energy, charge);
+
+	//* C
+	/* for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
 			// Indicizzazione atomi Ca [(i*3)+1]
@@ -568,7 +573,7 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 				energy += (charge[s[i]-'a'] * charge[s[j]-'a']) / (d*4.0);
 			}
 		}
-	}
+	} */
 	return energy;
 }
 

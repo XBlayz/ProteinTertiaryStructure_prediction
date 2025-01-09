@@ -156,3 +156,133 @@ end_i_loop:
 		mov		rsp, rbp	; ripristina lo Stack Pointer
 		pop		rbp		    ; ripristina il Base Pointer
 		ret				    ; torna alla funzione C chiamante
+
+
+; ------------------------------------------------------------
+; Funzione e_energy
+; ------------------------------------------------------------
+global e_energy
+
+four	dq	4.0
+msgOk	db	"ok", 10, 0
+msgI	db	"i:", 0
+msgJ	db	"j:", 0
+
+e_energy:
+	; ------------------------------------------------------------
+	; Sequenza di ingresso nella funzione
+	; ------------------------------------------------------------
+		push		rbp				; salva il Base Pointer
+		mov		rbp, rsp			; il Base Pointer punta al Record di Attivazione corrente
+		pushaq						; salva i registri generali
+
+	; ------------------------------------------------------------
+	; Funzione
+	; ------------------------------------------------------------
+		; RDI: *s, RSI: n, RDX: *coords, RCX: *e, R8: *charge
+		MOV			[eEPointer], RCX		; ePointer = *e
+		XOR 		R9, R9					; R9: i=0
+		VXORPD		XMM0, XMM0				; XMM0: | 0 | energy=0 |
+
+		MOV			R11, 3*8				; R11 = 3*8
+		VMOVSD		XMM4, [ten]				; XMM4 = 10.0
+e_start_loop_i:
+		; if (i < n)
+		CMP			R9, RSI
+		JGE			e_end_i_loop
+
+		MOV			R10, R9				; R10: j=i
+		INC			R10					; R10: j=i+1
+e_start_loop_j:
+		; if (j < n)
+		CMP			R10, RSI
+		JGE			e_end_j_loop
+		; if (i != j)
+		CMP			R9, R10
+		JE			e_j_loop
+
+		; charge[s[i]-'a']
+		XOR			RAX, RAX				; RAX = 0
+		MOV			AL, [RDI+R9]			; AL = s[i]
+		SUB			AL, 97					; AL = s[i]-'a'
+		VMOVSD		XMM6, [R8+RAX]			; XMM6 = charge[s[i]-'a']
+		; if (charge[s[i]-'a'] != 0)
+		VXORPD			XMM2, XMM2
+		VCMPSD			XMM5, XMM6, XMM2, 0
+		MOVMSKPD		RCX, XMM5
+		CMP				RCX, 0
+		JG				e_j_loop
+
+		; charge[s[j]-'a']
+		XOR			RAX, RAX				; RAX = 0
+		MOV			AL, [RDI+R10]			; AL = s[j]
+		SUB			AL, 97					; AL = s[j]-'a'
+		VMOVSD		XMM7, [R8+RAX]			; XMM7 = charge[s[i]-'a']
+		; if (charge[s[j]-'a'] != 0)
+		VXORPD			XMM2, XMM2
+		VCMPSD			XMM5, XMM7, XMM2, 0
+		MOVMSKPD		RCX, XMM5
+		CMP				RCX, 0
+		JG				e_j_loop
+
+		; ix
+		MOV			RAX, 3					; RAX = 3
+		IMUL		RAX, R9					; RAX = i*3
+		ADD			RAX, 1					; RAX = i*3 + 1 //Atomo Ca
+		IMUL		RAX, R11				; RAX = (i*3 + 1)*3*8 //Coordinata
+		; jx
+		MOV			RCX, 3					; RCX = 3
+		IMUL		RCX, R10				; RCX = j*3
+		ADD			RCX, 1					; RCX = j*3 + 1 //Atomo Ca
+		IMUL		RCX, R11				; RCX = (j*3 + 1)*3*8 //Coordinata
+
+		; v[ix]
+		VMOVUPD			XMM1, [RDX+RAX]				; XMM1 <- v[(i*3 + 1)*3], v[(i*3 + 1)*3+1]
+		VMOVSD			XMM2, [RDX+RAX+16]			; XMM2 <- v[(i*3 + 1)*3+2]
+		VPERM2F128		YMM1, YMM1, YMM2, 0x20		; YMM1 <- | xxx | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VANDPD			YMM1, YMM1, [mask]			; YMM1 <- |  0  | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		; v[jx]
+		VMOVUPD			XMM2, [RDX+RCX]				; XMM2 <- v[(j*3 + 1)*3], v[(j*3 + 1)*3+1]
+		VMOVSD			XMM3, [RDX+RCX+16]			; XMM3 <- v[(j*3 + 1)*3+2]
+		VPERM2F128		YMM2, YMM2, YMM3, 0x20		; YMM2 <- | xxx | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- |  0  | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+
+		; Distance
+		VSUBPD			YMM1, YMM2, YMM1			; YMM1 <- | v[(j*3 + 1)*3] - v[(i*3 + 1)*3] | v[(j*3 + 1)*3+1] - v[(i*3 + 1)*3+1] | v[(j*3 + 1)*3+2] - v[(i*3 + 1)*3+2] |
+		VMULPD			YMM1, YMM1, YMM1
+		VPERM2F128		YMM2, YMM1, YMM1, 0x01
+		VADDPD			XMM1, XMM1, XMM2
+		VPERMILPD 		XMM2, XMM1, 0x03
+		VADDPD			XMM1, XMM1, XMM2
+		VSQRTSD			XMM1, XMM1, XMM1
+
+		; if (d < 10.0)
+		VCMPSD			XMM5, XMM1, XMM4, 5
+		MOVMSKPD		RCX, XMM5
+		CMP				RCX, 0
+		JG				e_j_loop
+
+		; ENERGIA
+		VMULSD			XMM6, XMM6, XMM7			; XMM6 = charge[s[i]-'a'] * charge[s[j]-'a']
+		VMULSD			XMM7, XMM1, [four]			; XMM7 = d * 4.0
+		VDIVSD			XMM6, XMM6, XMM7			; XMM6 = XMM6 / XMM7
+		VADDSD			XMM0, XMM0, XMM6			; XMM0 += XMM6
+
+e_j_loop:
+		INC			R10						; j++
+		JMP			e_start_loop_j
+
+e_end_j_loop:
+		INC 		R9						; i++
+		JMP			e_start_loop_i
+
+e_end_i_loop:
+		MOV			RCX, [eEPointer]
+		VMOVSD		[RCX], XMM0			; e = XMM7
+	; ------------------------------------------------------------
+	; Sequenza di uscita dalla funzione
+	; ------------------------------------------------------------
+		popaq				; ripristina i registri generali
+		mov		rsp, rbp	; ripristina lo Stack Pointer
+		pop		rbp		    ; ripristina il Base Pointer
+		ret				    ; torna alla funzione C chiamante
