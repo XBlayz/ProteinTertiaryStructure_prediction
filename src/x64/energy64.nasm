@@ -164,9 +164,6 @@ end_i_loop:
 global e_energy
 
 four	dq	4.0
-msgOk	db	"ok", 10, 0
-msgI	db	"i:", 0
-msgJ	db	"j:", 0
 
 e_energy:
 	; ------------------------------------------------------------

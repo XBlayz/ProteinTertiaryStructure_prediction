@@ -1,4 +1,4 @@
-Flat profile: Funzione "packing_energy" e "electrostatic_energy" ottimizzata in assembly
+Flat profile: Funzione "packing_energy" e "electrostatic_energy" ottimizzate in assembly
 
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total
