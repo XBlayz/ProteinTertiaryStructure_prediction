@@ -512,11 +512,16 @@ type dist(VECTOR i, VECTOR j) {
 }
 
 // -MAIN-
+extern void h_energy(char* s, int n, MATRIX coords, type* e, type* h);
+
 type hydrophobic_energy(char* s, int n, MATRIX coords) {
-	//TODO: Assembly
 	type energy = 0;
 
-	for(int i = 0; i<n; i++) {
+	//* ASSEMBLY
+	h_energy(s, n, coords, &energy, hydrophobicity);
+
+	//* C
+	/* for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
 			// Indicizzazione atomi Ca [(i*3)+1]
@@ -537,7 +542,7 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 				energy += (hydrophobicity[s[i]-'a'] * hydrophobicity[s[j]-'a']) / d;
 			}
 		}
-	}
+	} */
 	return energy;
 }
 
