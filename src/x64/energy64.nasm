@@ -6,7 +6,8 @@ msgNl	db  0x0a, 0
 
 section .bss			; Sezione contenente dati non inizializzati
 alignb  32
-ePointer	resq    1
+pEPointer	resq    1
+eEPointer	resq    1
 
 section .text			; Sezione contenente il codice macchina
 
@@ -47,12 +48,6 @@ global p_energy
 
 mask	dq	0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0x0
 ten		dq	10.0
-msgOk	db  'ok', 10, 0
-msgI	db  'i:', 0
-msgJ	db  'j:', 0
-msgIx	db  'ix:', 0
-msgJx	db  'jx:', 0
-msgX	db  'x:', 0
 
 p_energy:
 	; ------------------------------------------------------------
@@ -66,10 +61,9 @@ p_energy:
 	; Funzione
 	; ------------------------------------------------------------
 		; RDI: *s, RSI: n, RDX: *coords, RCX: *e, R8: *volume
-		MOV			[ePointer], RCX			; ePointer = *e
+		MOV			[pEPointer], RCX		; ePointer = *e
 		MOV			R11, R8					; R11: *volume
 		XOR 		R8, R8					; R8: i=0
-		XOR			R9, R9					; R9: j=0
 		VXORPD		XMM0, XMM0				; XMM0: | 0 | density=0 |
 		VXORPD		XMM7, XMM7				; XMM7: | 0 | energy=0 |
 
@@ -79,11 +73,7 @@ start_loop_i:
 		CMP			R8, RSI
 		JGE			end_i_loop
 
-		MOV			RAX, 3					; RAX = 3
-		IMUL		RAX, R8					; RAX = i*3
-		ADD			RAX, 1					; RAX = i*3 + 1 //Atomo Ca
-		IMUL		RAX, R10				; RAX = (i*3 + 1)*3*8 //Coordinata
-
+		XOR			R9, R9					; R9: j=0
 start_loop_j:
 		; if (j < n)
 		CMP			R9, RSI
@@ -92,17 +82,23 @@ start_loop_j:
 		CMP			R8, R9
 		JE			loop_j
 
+		; ix
+		MOV			RAX, 3					; RAX = 3
+		IMUL		RAX, R8					; RAX = i*3
+		ADD			RAX, 1					; RAX = i*3 + 1 //Atomo Ca
+		IMUL		RAX, R10				; RAX = (i*3 + 1)*3*8 //Coordinata
+		; jx
 		MOV			RCX, 3					; RCX = 3
 		IMUL		RCX, R9					; RCX = j*3
 		ADD			RCX, 1					; RCX = j*3 + 1 //Atomo Ca
 		IMUL		RCX, R10				; RCX = (j*3 + 1)*3*8 //Coordinata
 
-		; v[i]
+		; v[ix]
 		VMOVUPD			XMM1, [RDX+RAX]				; XMM1 <- v[(i*3 + 1)*3], v[(i*3 + 1)*3+1]
 		VMOVSD			XMM2, [RDX+RAX+16]			; XMM2 <- v[(i*3 + 1)*3+2]
 		VPERM2F128		YMM1, YMM1, YMM2, 0x20		; YMM1 <- | xxx | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		VANDPD			YMM1, YMM1, [mask]			; YMM1 <- |  0  | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
-		; v[j]
+		; v[jx]
 		VMOVUPD			XMM2, [RDX+RCX]				; XMM2 <- v[(j*3 + 1)*3], v[(j*3 + 1)*3+1]
 		VMOVSD			XMM3, [RDX+RCX+16]			; XMM3 <- v[(j*3 + 1)*3+2]
 		VPERM2F128		YMM2, YMM2, YMM3, 0x20		; YMM2 <- | xxx | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
@@ -117,7 +113,7 @@ start_loop_j:
 		VADDPD			XMM1, XMM1, XMM2
 		VSQRTSD			XMM1, XMM1, XMM1
 
-		; if (d >= 10.0)
+		; if (d < 10.0)
 		VMOVSD			XMM4, [ten]
 		VCMPSD			XMM5, XMM1, XMM4, 5
 		MOVMSKPD		RCX, XMM5
@@ -151,7 +147,7 @@ loop_i:
 		JMP		start_loop_i
 
 end_i_loop:
-		MOV				RCX, [ePointer]
+		MOV				RCX, [pEPointer]
 		VMOVSD			[RCX], XMM7					; e = XMM7
 	; ------------------------------------------------------------
 	; Sequenza di uscita dalla funzione
