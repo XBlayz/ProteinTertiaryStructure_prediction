@@ -1,8 +1,15 @@
 %include "sseutils64.nasm"
 
 section .data			; Sezione contenente dati inizializzati
+; DEBUG String
+msg_d   db  '%f', 10, 0
+msg_end db  '-', 10, 0
 int_fmt db '%d', 0
 msgNl	db  0x0a, 0
+msg_c   db  '%c', 0
+
+msg_i	db	'i', 0
+msg_j	db	'j', 0
 
 section .bss			; Sezione contenente dati non inizializzati
 alignb  32
@@ -10,10 +17,51 @@ pEPointer	resq    1
 eEPointer	resq    1
 hEPointer	resq    1
 
+; Utility memory address
+tmp1    resq    4
+
 section .text			; Sezione contenente il codice macchina
 
 extern get_block
 extern free_block
+
+; -Print value macro-
+; Print double
+extern printf
+%macro	print_double	1
+		pushaq
+		mov		  rax, 1
+		mov		  rdi, msg_d
+		vmovsd  xmm0, [%1]
+		call		printf
+		popaq
+%endmacro
+; Print end
+%macro	print_end 0
+    pushaq
+    mov		  rax, 1
+    mov		  rdi, msg_end
+    call		printf
+    popaq
+%endmacro
+
+; -Print register macro-
+; Print ymm
+%macro	print_ymm	1
+    VMOVUPD   [tmp1], %1
+    print_double tmp1
+    print_double tmp1+8
+    print_double tmp1+16
+    print_double tmp1+24
+    print_end
+%endmacro
+; Print xmm
+%macro	print_xmm	1
+    VMOVUPD   [tmp1], %1
+    print_double tmp1
+    print_double tmp1+8
+    print_end
+%endmacro
 
 %macro	getmem	2
 	mov	rdi, %1
@@ -42,6 +90,37 @@ extern free_block
 	iprint %2
 %endmacro
 
+%macro cprint 1
+    pushaq                      ; Save all registers
+    mov rdi, msg_c	            ; Load format string into rdi
+    mov rsi, %1                 ; Load the integer value into rsi
+    xor rax, rax                ; Clear rax as required by printf
+    call printf                 ; Call printf
+    popaq                       ; Restore all registers
+
+	prints msgNl
+%endmacro
+
+; ------------------------------------------------------------
+; Macro utility
+; ------------------------------------------------------------
+; -Formula distanza-
+%macro dist 4
+	; %1: Va(YMMa), %2: Vb(YMMb), %3: (Vr)XMMa, %4: (-)XMMb
+    ; Differenza
+    VSUBPD			%1, %2, %1          	; %1: |0|Az-Bz|Ay-By|Ax-Bx|
+    ; Quadrati
+    VMULPD			%1, %1, %1          	; %1: |0|(Az-Bz)^2|(Ay-By)^2|(Ax-Bx)^2|
+
+    ; Somma
+    VHADDPD         %1, %1, %1            	; %1: |(Az-Bz)^2|(Az-Bz)^2|(Ay-By)^2 + (Ax-Bx)^2|(Ay-By)^2 + (Ax-Bx)^2|
+    VEXTRACTF128    %4, %1, 0b00000001      ; %4: |(Az-Bz)^2|(Az-Bz)^2|
+    VADDSD          %3, %3, %4            	; %3: |---|(Az-Bz)^2 + (Ay-By)^2 + (Ax-Bx)^2|
+
+    ; Radice quadrata
+    VSQRTSD         %3, %3                  ; %3: |---|sqrt((Az-Bz)^2 + (Ay-By)^2 + (Ax-Bx)^2)|
+%endmacro
+
 ; ------------------------------------------------------------
 ; Funzione p_energy
 ; ------------------------------------------------------------
@@ -65,21 +144,22 @@ p_energy:
 		MOV			[pEPointer], RCX		; ePointer = *e
 		MOV			R11, R8					; R11: *volume
 		XOR 		R8, R8					; R8: i=0
-		VXORPD		XMM0, XMM0				; XMM0: | 0 | density=0 |
 		VXORPD		XMM7, XMM7				; XMM7: | 0 | energy=0 |
 
 		MOV			R10, 3*8				; R10 = 3*8
+		VMOVSD		XMM4, [ten]
 start_loop_i:
 		; if (i < n)
 		CMP			R8, RSI
 		JGE			end_i_loop
 
+		VXORPD		XMM0, XMM0				; XMM0: | 0 | density=0 |
 		XOR			R9, R9					; R9: j=0
 start_loop_j:
 		; if (j < n)
 		CMP			R9, RSI
 		JGE			end_j_loop
-		; if (i == j)
+		; if (i != j)
 		CMP			R8, R9
 		JE			loop_j
 
@@ -105,17 +185,10 @@ start_loop_j:
 		VPERM2F128		YMM2, YMM2, YMM3, 0x20		; YMM2 <- | xxx | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- |  0  | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
-		VSUBPD			YMM1, YMM2, YMM1			; YMM1 <- | v[(j*3 + 1)*3] - v[(i*3 + 1)*3] | v[(j*3 + 1)*3+1] - v[(i*3 + 1)*3+1] | v[(j*3 + 1)*3+2] - v[(i*3 + 1)*3+2] |
-
-		VMULPD			YMM1, YMM1, YMM1
-		VPERM2F128		YMM2, YMM1, YMM1, 0x01
-		VADDPD			XMM1, XMM1, XMM2
-		VPERMILPD 		XMM2, XMM1, 0x03
-		VADDPD			XMM1, XMM1, XMM2
-		VSQRTSD			XMM1, XMM1, XMM1
+		; Distanza
+		dist			YMM1, YMM2, XMM1, XMM2
 
 		; if (d < 10.0)
-		VMOVSD			XMM4, [ten]
 		VCMPSD			XMM5, XMM1, XMM4, 5
 		MOVMSKPD		RCX, XMM5
 		CMP				RCX, 0
@@ -126,8 +199,8 @@ start_loop_j:
 		VMULSD			XMM2, XMM2, XMM1			; XMM2 = d^3
 		XOR				RAX, RAX					; RAX = 0
 		MOV				AL, [RDI+R9]				; AL = s[j]
-		SUB				AL, 97						; AL = s[j]-'a'
-		VMOVSD			XMM3, [R11+RAX]				; XMM3 = volume[s[j]-'a']
+		SUB				AL, 65						; AL = s[j]-'a'
+		VMOVSD			XMM3, [R11+RAX*8]			; XMM3 = volume[s[j]-'a']
 		VDIVSD			XMM3, XMM3, XMM2			; XMM3 = volume[s[j]-'a'] / d^3
 		VADDSD			XMM0, XMM0, XMM3			; XMM0 += volume[s[j]-'a'] / d^3
 
@@ -137,12 +210,12 @@ loop_j:
 
 end_j_loop:
 		XOR				RAX, RAX					; RAX = 0
-		MOV				AL, [RDI+R9]				; AL = s[j]
-		SUB				AL, 97						; AL = s[j]-'a'
-		VMOVSD			XMM3, [R11+RAX]				; XMM3 = volume[s[j]-'a']
-		VSUBSD			XMM3, XMM3, XMM0			; XMM3 = volume[s[j]-'a'] - XMM0
-		VMULSD			XMM3, XMM3, XMM3			; XMM3 = (volume[s[j]-'a'] - XMM0)^2
-		VADDSD			XMM7, XMM7, XMM3			; XMM7 += (volume[s[j]-'a'] - XMM0)^2
+		MOV				AL, [RDI+R8]				; AL = s[i]
+		SUB				AL, 65						; AL = s[i]-'a'
+		VMOVSD			XMM3, [R11+RAX*8]			; XMM3 = volume[s[i]-'a']
+		VSUBSD			XMM3, XMM3, XMM0			; XMM3 = volume[s[i]-'a'] - XMM0
+		VMULSD			XMM3, XMM3, XMM3			; XMM3 = (volume[s[i]-'a'] - XMM0)^2
+		VADDSD			XMM7, XMM7, XMM3			; XMM7 += (volume[s[i]-'a'] - XMM0)^2
 loop_i:
 		INC 	R8				; i++
 		JMP		start_loop_i
@@ -202,8 +275,8 @@ e_start_loop_j:
 		; charge[s[i]-'a']
 		XOR			RAX, RAX				; RAX = 0
 		MOV			AL, [RDI+R9]			; AL = s[i]
-		SUB			AL, 97					; AL = s[i]-'a'
-		VMOVSD		XMM6, [R8+RAX]			; XMM6 = charge[s[i]-'a']
+		SUB			AL, 65					; AL = s[i]-'a'
+		VMOVSD		XMM6, [R8+RAX*8]		; XMM6 = charge[s[i]-'a']
 		; if (charge[s[i]-'a'] != 0)
 		VXORPD			XMM2, XMM2
 		VCMPSD			XMM5, XMM6, XMM2, 0
@@ -214,8 +287,8 @@ e_start_loop_j:
 		; charge[s[j]-'a']
 		XOR			RAX, RAX				; RAX = 0
 		MOV			AL, [RDI+R10]			; AL = s[j]
-		SUB			AL, 97					; AL = s[j]-'a'
-		VMOVSD		XMM7, [R8+RAX]			; XMM7 = charge[s[i]-'a']
+		SUB			AL, 65					; AL = s[j]-'a'
+		VMOVSD		XMM7, [R8+RAX*8]		; XMM7 = charge[s[i]-'a']
 		; if (charge[s[j]-'a'] != 0)
 		VXORPD			XMM2, XMM2
 		VCMPSD			XMM5, XMM7, XMM2, 0
@@ -246,13 +319,7 @@ e_start_loop_j:
 		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- |  0  | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distance
-		VSUBPD			YMM1, YMM2, YMM1			; YMM1 <- | v[(j*3 + 1)*3] - v[(i*3 + 1)*3] | v[(j*3 + 1)*3+1] - v[(i*3 + 1)*3+1] | v[(j*3 + 1)*3+2] - v[(i*3 + 1)*3+2] |
-		VMULPD			YMM1, YMM1, YMM1
-		VPERM2F128		YMM2, YMM1, YMM1, 0x01
-		VADDPD			XMM1, XMM1, XMM2
-		VPERMILPD 		XMM2, XMM1, 0x03
-		VADDPD			XMM1, XMM1, XMM2
-		VSQRTSD			XMM1, XMM1, XMM1
+		dist			YMM1, YMM2, XMM1, XMM2
 
 		; if (d < 10.0)
 		VCMPSD			XMM5, XMM1, XMM4, 5
@@ -324,14 +391,14 @@ h_start_loop_j:
 		; hydrophobicity[s[i]-'a']
 		XOR			RAX, RAX				; RAX = 0
 		MOV			AL, [RDI+R9]			; AL = s[i]
-		SUB			AL, 97					; AL = s[i]-'a'
-		VMOVSD		XMM6, [R8+RAX]			; XMM6 = hydrophobicity[s[i]-'a']
+		SUB			AL, 65					; AL = s[i]-'a'
+		VMOVSD		XMM6, [R8+RAX*8]		; XMM6 = hydrophobicity[s[i]-'a']
 
 		; hydrophobicity[s[j]-'a']
 		XOR			RAX, RAX				; RAX = 0
 		MOV			AL, [RDI+R10]			; AL = s[j]
-		SUB			AL, 97					; AL = s[j]-'a'
-		VMOVSD		XMM7, [R8+RAX]			; XMM7 = hydrophobicity[s[i]-'a']
+		SUB			AL, 65					; AL = s[j]-'a'
+		VMOVSD		XMM7, [R8+RAX*8]		; XMM7 = hydrophobicity[s[i]-'a']
 
 		; ix
 		MOV			RAX, 3					; RAX = 3
@@ -356,13 +423,7 @@ h_start_loop_j:
 		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- |  0  | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distance
-		VSUBPD			YMM1, YMM2, YMM1			; YMM1 <- | v[(j*3 + 1)*3] - v[(i*3 + 1)*3] | v[(j*3 + 1)*3+1] - v[(i*3 + 1)*3+1] | v[(j*3 + 1)*3+2] - v[(i*3 + 1)*3+2] |
-		VMULPD			YMM1, YMM1, YMM1
-		VPERM2F128		YMM2, YMM1, YMM1, 0x01
-		VADDPD			XMM1, XMM1, XMM2
-		VPERMILPD 		XMM2, XMM1, 0x03
-		VADDPD			XMM1, XMM1, XMM2
-		VSQRTSD			XMM1, XMM1, XMM1
+		dist			YMM1, YMM2, XMM1, XMM2
 
 		; if (d < 10.0)
 		VCMPSD			XMM5, XMM1, XMM4, 5

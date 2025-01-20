@@ -539,7 +539,7 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 
 			if(d < 10.0) {
 				// Calcolo energia
-				energy += (hydrophobicity[s[i]-'a'] * hydrophobicity[s[j]-'a']) / d;
+				energy += (hydrophobicity[s[i]-'A'] * hydrophobicity[s[j]-'A']) / d;
 			}
 		}
 	} */
@@ -573,9 +573,9 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 			dealloc_matrix(vi);
 			dealloc_matrix(vj);
 
-			if(i != j && d < 10.0 && charge[s[i]-'a'] != 0 && charge[s[j]-'a'] != 0) {
+			if(i != j && d < 10.0 && charge[s[i]-'A'] != 0 && charge[s[j]-'A'] != 0) {
 				// Calcolo energia
-				energy += (charge[s[i]-'a'] * charge[s[j]-'a']) / (d*4.0);
+				energy += (charge[s[i]-'A'] * charge[s[j]-'A']) / (d*4.0);
 			}
 		}
 	} */
@@ -588,12 +588,13 @@ extern void p_energy(char* s, int n, MATRIX coords, type* e, type* v);
 
 type packing_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
+	int count = 0;
 
 	//* ASSEMBLY
 	p_energy(s, n, coords, &energy, volume);
 
 	//* C
-	/* for(int i = 0; i<n; i++) {
+	/*for(int i = 0; i<n; i++) {
 		type density = 0;
 		for(int j = 0; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
@@ -612,11 +613,11 @@ type packing_energy(char* s, int n, MATRIX coords) {
 
 			if(i != j && d < 10.0) {
 				// Calcolo densità
-				density += volume[s[j]-'a'] / (d*d*d);
+				density += volume[s[j]-'A'] / (d*d*d);
 			}
 		}
 		// Calcolo energia
-		type tmp = volume[s[i]-'a'] - density;
+		type tmp = volume[s[i]-'A'] - density;
 		energy += tmp*tmp;
 	} */
 	return energy;
