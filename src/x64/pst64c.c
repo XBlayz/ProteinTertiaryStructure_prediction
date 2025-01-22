@@ -492,7 +492,7 @@ type rama_energy(int n, VECTOR phi, VECTOR psi) {
 		type b = modulo(tmp);
 		dealloc_matrix(tmp);
 		// Calcolo energia
-		energy += 0.5 * (a<b ? a : b);
+		energy += 0.5 * (a<=b ? a : b);
 	}
 	return energy;
 }
@@ -594,7 +594,7 @@ type packing_energy(char* s, int n, MATRIX coords) {
 	p_energy(s, n, coords, &energy, volume);
 
 	//* C
-	/*for(int i = 0; i<n; i++) {
+	/* for(int i = 0; i<n; i++) {
 		type density = 0;
 		for(int j = 0; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
@@ -655,8 +655,7 @@ void pst(params* input) {
 
 	int t = 0;
 	do {
-		//! int i = random() * input->N;
-		int i = rand() % input->N;
+		int i = random() * input->N;
 		type dev_phi = (random()*2 * M_PI) - M_PI;
 		type dev_psi = (random()*2 * M_PI) - M_PI;
 
@@ -673,9 +672,10 @@ void pst(params* input) {
 
 			if(r <= p) {
 				input->e = new_e;
+			} else {
+				input->phi[i] -= dev_phi;
+				input->psi[i] -= dev_psi;
 			}
-			input->phi[i] -= dev_phi;
-			input->psi[i] -= dev_psi;
 		}
 
 		// Aggiorno la temperatura
