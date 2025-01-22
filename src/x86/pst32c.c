@@ -95,7 +95,7 @@ typedef struct {
 */
 
 void* get_block(int size, int elements) {
-	return _mm_malloc(elements*size,16);
+	return _mm_malloc(elements*size,32);
 }
 
 void free_block(void* p) {
@@ -281,15 +281,12 @@ void gen_rnd_mat(VECTOR v, int N){
 
 // PROCEDURE ASSEMBLY
 extern void prova(params* input);
-//TODO: extern void sum_quad(VECTOR v, type* r);
 
 // --ROTATION--
 // -UTILITY-
 type modulo(VECTOR v) {
     // Modulo di un vettore 3D
 	type r = 0;
-	//TODO: sum_quad(v, &r);
-	//TODO: return sqrt(r);
 	return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
@@ -486,7 +483,7 @@ type rama_energy(int n, VECTOR phi, VECTOR psi) {
 		type b = modulo(tmp);
 		dealloc_matrix(tmp);
 		// Calcolo energia
-		energy += 0.5 * (a<b ? a : b);
+		energy += 0.5 * (a<=b ? a : b);
 	}
 	return energy;
 }
@@ -506,9 +503,15 @@ type dist(VECTOR i, VECTOR j) {
 }
 
 // -MAIN-
+//extern void h_energy(char* s, int n, MATRIX coords, type* e, type* h);
+
 type hydrophobic_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
 
+	//* ASSEMBLY
+	//h_energy(s, n, coords, &energy, hydrophobicity);
+
+	//* C
 	for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
@@ -527,7 +530,7 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 
 			if(d < 10.0) {
 				// Calcolo energia
-				energy += (hydrophobicity[s[i]-'a'] * hydrophobicity[s[j]-'a']) / d;
+				energy += (hydrophobicity[s[i]-'A'] * hydrophobicity[s[j]-'A']) / d;
 			}
 		}
 	}
@@ -536,9 +539,15 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 
 // --ELECTROSTATIC-ENERGY--
 // -MAIN-
+//extern void e_energy(char* s, int n, MATRIX coords, type* e, type* c);
+
 type electrostatic_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
 
+	//* ASSEMBLY
+	//e_energy(s, n, coords, &energy, charge);
+
+	//* C
 	for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
@@ -555,9 +564,9 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 			dealloc_matrix(vi);
 			dealloc_matrix(vj);
 
-			if(i != j && d < 10.0 && charge[s[i]-'a'] != 0 && charge[s[j]-'a'] != 0) {
+			if(i != j && d < 10.0 && charge[s[i]-'A'] != 0 && charge[s[j]-'A'] != 0) {
 				// Calcolo energia
-				energy += (charge[s[i]-'a'] * charge[s[j]-'a']) / (d*4.0);
+				energy += (charge[s[i]-'A'] * charge[s[j]-'A']) / (d*4.0);
 			}
 		}
 	}
@@ -566,9 +575,16 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 
 // --PACKING-ENERGY--
 // -MAIN-
+extern void p_energy(char* s, int n, MATRIX coords, type* e, type* v);
+
 type packing_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
 
+	//* ASSEMBLY
+	type energy_assembly = 0;
+	p_energy(s, n, coords, &energy_assembly, volume);
+
+	//* C
 	for(int i = 0; i<n; i++) {
 		type density = 0;
 		for(int j = 0; j<n; j++) {
@@ -578,7 +594,7 @@ type packing_energy(char* s, int n, MATRIX coords) {
 			vi[1] = coords[((i*3)+1)*3+1];
 			vi[2] = coords[((i*3)+1)*3+2];
 			VECTOR vj = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(i*3)+1]
+			// Indicizzazione atomi Ca [(j*3)+1]
 			vj[0] = coords[((j*3)+1)*3];
 			vj[1] = coords[((j*3)+1)*3+1];
 			vj[2] = coords[((j*3)+1)*3+2];
@@ -588,13 +604,14 @@ type packing_energy(char* s, int n, MATRIX coords) {
 
 			if(i != j && d < 10.0) {
 				// Calcolo densità
-				density += volume[s[j]-'a'] / (d*d*d);
+				density += volume[s[j]-'A'] / (d*d*d);
 			}
 		}
 		// Calcolo energia
-		type tmp = volume[s[i]-'a'] - density;
+		type tmp = volume[s[i]-'A'] - density;
 		energy += tmp*tmp;
 	}
+	printf("C: %f | ASS: %f\n", energy, energy_assembly);
 	return energy;
 }
 
@@ -630,7 +647,7 @@ void pst(params* input) {
 
 	int t = 0;
 	do {
-		int i = rand() % input->N;
+		int i = random() * input->N;
 		type dev_phi = (random()*2 * M_PI) - M_PI;
 		type dev_psi = (random()*2 * M_PI) - M_PI;
 
@@ -642,14 +659,15 @@ void pst(params* input) {
 		if(delta_e <= 0) {
 			input->e = new_e;
 		} else {
-			type p = exp(-delta_e / (input->k * temperatura));
+			type p = exp(-1*(delta_e / (input->k * temperatura)));
 			type r = random();
 
 			if(r <= p) {
 				input->e = new_e;
+			} else {
+				input->phi[i] -= dev_phi;
+				input->psi[i] -= dev_psi;
 			}
-			input->phi[i] -= dev_phi;
-			input->psi[i] -= dev_psi;
 		}
 
 		// Aggiorno la temperatura
@@ -819,17 +837,20 @@ int main(int argc, char** argv) {
 	t = clock() - t;
 	time = ((float)t)/CLOCKS_PER_SEC;
 
-	if(!input->silent)
-		printf("PST time = %.3f secs\n", time);
-	else
-		printf("%.3f\n", time);
+	if(!input->silent) {
+        printf("PST time = %.3f secs\n", time);
+        printf("Energy = %f\n", input->e);
+	} else {
+			printf("%.3f\n", time);
+			printf("%f\n", input->e);
+	}
 
 	//
 	// Salva il risultato
 	//
-	sprintf(fname_phi, "out32_%d_%d_phi.ds2", input->N, input->sd);
+	sprintf(fname_phi, "out32_%d_%d_%.3f_%.3f_%.3f_phi.ds2", input->N, input->sd, input->to, input->alpha, input->k);
 	save_out(fname_phi, input->phi, input->N);
-	sprintf(fname_psi, "out32_%d_%d_psi.ds2", input->N, input->sd);
+	sprintf(fname_psi, "out32_%d_%d_%.3f_%.3f_%.3f_psi.ds2", input->N, input->sd, input->to, input->alpha, input->k);
 	save_out(fname_psi, input->psi, input->N);
 	if(input->display){
 		if(input->phi == NULL || input->psi == NULL)
