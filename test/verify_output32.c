@@ -69,8 +69,8 @@ int main(int argc, char const *argv[])
     printf("---\n");
 
     // -Load output-
-    char fname_phi[] = "../src/x86/out32_256_3_phi.ds2";
-	char fname_psi[] = "../src/x86/out32_256_3_psi.ds2";
+    char fname_phi[] = "../src/x86/out32_256_3_20.000_1.000_1.000_phi.ds2";
+	char fname_psi[] = "../src/x86/out32_256_3_20.000_1.000_1.000_psi.ds2";
 
     int r_phi, c_phi, r_psi, c_psi;
 
