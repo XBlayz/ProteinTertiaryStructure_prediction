@@ -95,7 +95,7 @@ typedef struct {
 */
 
 void* get_block(int size, int elements) {
-	return _mm_malloc(elements*size,16);
+	return _mm_malloc(elements*size,32);
 }
 
 void free_block(void* p) {
@@ -588,7 +588,6 @@ extern void p_energy(char* s, int n, MATRIX coords, type* e, type* v);
 
 type packing_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
-	int count = 0;
 
 	//* ASSEMBLY
 	p_energy(s, n, coords, &energy, volume);
@@ -845,17 +844,20 @@ int main(int argc, char** argv) {
 	t = clock() - t;
 	time = ((float)t)/CLOCKS_PER_SEC;
 
-	if(!input->silent)
-		printf("PST time = %.3f secs\n", time);
-	else
-		printf("%.3f\n", time);
+	if(!input->silent) {
+        printf("PST time = %.3f secs\n", time);
+        printf("Energy = %f\n", input->e);
+	} else {
+			printf("%.3f\n", time);
+			printf("%f\n", input->e);
+	}
 
 	//
 	// Salva il risultato
 	//
-	sprintf(fname_phi, "out64_%d_%d_phi.ds2", input->N, input->sd);
+	sprintf(fname_phi, "out64_%d_%d_%.3f_%.3f_%.3f_phi.ds2", input->N, input->sd, input->to, input->alpha, input->k);
 	save_out(fname_phi, input->phi, input->N);
-	sprintf(fname_psi, "out64_%d_%d_psi.ds2", input->N, input->sd);
+	sprintf(fname_psi, "out64_%d_%d_%.3f_%.3f_%.3f_psi.ds2", input->N, input->sd, input->to, input->alpha, input->k);
 	save_out(fname_psi, input->psi, input->N);
 	if(input->display){
 		if(input->phi == NULL || input->psi == NULL)

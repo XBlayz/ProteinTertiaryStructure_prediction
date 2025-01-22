@@ -17,6 +17,8 @@ pEPointer	resq    1
 eEPointer	resq    1
 hEPointer	resq    1
 
+tempP 		resq    8
+
 ; Utility memory address
 tmp1    resq    4
 
