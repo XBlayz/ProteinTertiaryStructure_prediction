@@ -103,23 +103,29 @@ int main(int argc, char const *argv[])
     }
     printf("---\n");
 
+    double qme1 = 0;
+    double qme2 = 0;
     for(int i = 0; i < r_phi*c_phi; i++){
         printf("[%d-PHI]: %f (%f)", i, rad_to_deg(phi[i]), rad_to_deg(phi_ref[i]));
+        qme1 += (phi[i] - phi_ref[i]) * (phi[i] - phi_ref[i]);
         if(fabs(phi[i] - phi_ref[i]) > 0.00001){
             printf(" [ERROR]\n");
         } else {
             printf(" [OK]\n");
         }
     }
+    printf("---\n");
     for(int i = 0; i < r_psi*c_psi; i++){
         printf("[%d-PSI]: %f (%f)", i, rad_to_deg(psi[i]), rad_to_deg(psi_ref[i]));
+        qme2 += (psi[i] - psi_ref[i]) * (psi[i] - psi_ref[i]);
         if(fabs(psi[i] - psi_ref[i]) > 0.00001){
             printf(" [ERROR]\n");
         } else {
             printf(" [OK]\n");
         }
     }
-
+    printf("---\n");
+    printf("[QUANTITY MEAN ERROR]: %f, %f\n", qme1/(r_phi*c_phi), qme2/(r_psi*c_psi));
     printf("---\n");
     printf("[END]\n");
     printf("---\n");
