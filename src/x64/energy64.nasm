@@ -1,108 +1,17 @@
 %include "sseutils64.nasm"
 
 section .data			; Sezione contenente dati inizializzati
-; DEBUG String
-msg_d   db  '%f', 10, 0
-msg_end db  '-', 10, 0
-int_fmt db '%d', 0
-msgNl	db  0x0a, 0
-msg_c   db  '%c', 0
-
-msg_i	db	'i', 0
-msg_j	db	'j', 0
+alignb  32
+mask	dq	0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0x0
+ten		dq	10.0
+four	dq	4.0
 
 section .bss			; Sezione contenente dati non inizializzati
-alignb  32
 pEPointer	resq    1
 eEPointer	resq    1
 hEPointer	resq    1
 
-tempP 		resq    8
-
-; Utility memory address
-tmp1    resq    4
-
 section .text			; Sezione contenente il codice macchina
-
-extern get_block
-extern free_block
-
-; -Print value macro-
-; Print double
-extern printf
-%macro	print_double	1
-		pushaq
-		mov		  rax, 1
-		mov		  rdi, msg_d
-		vmovsd  xmm0, [%1]
-		call		printf
-		popaq
-%endmacro
-; Print end
-%macro	print_end 0
-    pushaq
-    mov		  rax, 1
-    mov		  rdi, msg_end
-    call		printf
-    popaq
-%endmacro
-
-; -Print register macro-
-; Print ymm
-%macro	print_ymm	1
-    VMOVUPD   [tmp1], %1
-    print_double tmp1
-    print_double tmp1+8
-    print_double tmp1+16
-    print_double tmp1+24
-    print_end
-%endmacro
-; Print xmm
-%macro	print_xmm	1
-    VMOVUPD   [tmp1], %1
-    print_double tmp1
-    print_double tmp1+8
-    print_end
-%endmacro
-
-%macro	getmem	2
-	mov	rdi, %1
-	mov	rsi, %2
-	call	get_block
-%endmacro
-
-%macro	fremem	1
-	mov	rdi, %1
-	call	free_block
-%endmacro
-
-%macro iprint 1
-    pushaq                      ; Save all registers
-    mov rdi, int_fmt            ; Load format string into rdi
-    mov rsi, %1                 ; Load the integer value into rsi
-    xor rax, rax                ; Clear rax as required by printf
-    call printf                 ; Call printf
-    popaq                       ; Restore all registers
-
-	prints msgNl
-%endmacro
-
-%macro vprint 2
-	prints %1
-	iprint %2
-%endmacro
-
-%macro cprint 1
-    pushaq                      ; Save all registers
-    mov rdi, msg_c	            ; Load format string into rdi
-    mov rsi, %1                 ; Load the integer value into rsi
-    xor rax, rax                ; Clear rax as required by printf
-    call printf                 ; Call printf
-    popaq                       ; Restore all registers
-
-	prints msgNl
-%endmacro
-
 ; ------------------------------------------------------------
 ; Macro utility
 ; ------------------------------------------------------------
@@ -127,9 +36,6 @@ extern printf
 ; Funzione p_energy
 ; ------------------------------------------------------------
 global p_energy
-
-mask	dq	0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0x0
-ten		dq	10.0
 
 p_energy:
 	; ------------------------------------------------------------
@@ -238,8 +144,6 @@ end_i_loop:
 ; Funzione e_energy
 ; ------------------------------------------------------------
 global e_energy
-
-four	dq	4.0
 
 e_energy:
 	; ------------------------------------------------------------

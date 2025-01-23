@@ -1,58 +1,15 @@
 %include "sseutils32.nasm"
 
 section .data			; Sezione contenente dati inizializzati
-alignb  4
+alignb  16
 mask	dd	0xffffffff, 0xffffffff, 0xffffffff, 0x0
 ten		dd	10.0
 four	dd	4.0
-
-; DEBUG String
-nl	db	10, 0
-sep	db	'|', 0
 
 section .bss			; Sezione contenente dati non inizializzati
 __print_xmm_temp__	resd	4
 
 section .text			; Sezione contenente il codice macchina
-; ------------------------------------------------------------
-; Macro debug
-; ------------------------------------------------------------
-%macro print_int 1
-	pushad
-
-	printi	%1
-	prints	nl
-
-	popad
-%endmacro
-
-%macro print_float 1
-	pushad
-
-	sprint	%1
-	prints	nl
-
-	popad
-%endmacro
-
-%macro print_xmm 1
-	pushad
-
-	MOVUPD		[__print_xmm_temp__], %1
-	prints		sep
-	sprint		__print_xmm_temp__+12
-	prints		sep
-	sprint		__print_xmm_temp__+8
-	prints		sep
-	sprint		__print_xmm_temp__+4
-	prints		sep
-	sprint		__print_xmm_temp__
-	prints		sep
-	prints		nl
-
-	popad
-%endmacro
-
 ; ------------------------------------------------------------
 ; Macro utility
 ; ------------------------------------------------------------
