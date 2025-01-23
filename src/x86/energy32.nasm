@@ -7,7 +7,6 @@ ten		dd	10.0
 four	dd	4.0
 
 section .bss			; Sezione contenente dati non inizializzati
-__print_xmm_temp__	resd	4
 
 section .text			; Sezione contenente il codice macchina
 ; ------------------------------------------------------------
