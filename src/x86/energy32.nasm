@@ -77,22 +77,24 @@ p_start_loop_j:
 		shl  		ecx, 1      		; ecx = i*2
 		add  		ecx, eax     		; ecx = i*3 (= i*2 + i)
 		add  		ecx, 1      		; ecx = i*3 + 1
-		IMUL		ecx, ecx, 12		; ecx = (i*3 + 1)*3*4 //Cooedinata
+		shl			ecx, 4				; ecx = (i*3 +1)*4*4
+		;IMUL		ecx, ecx, 12		; ecx = (i*3 + 1)*3*4 //Cooedinata
 		; jx
 		mov  		edx, ebx			; edx = j
 		shl  		edx, 1      		; edx = j*2
 		add  		edx, ebx     		; edx = j*3 (= j*2 + j)
 		add  		edx, 1      		; edx = j*3 + 1
-		IMUL		edx, edx, 12		; edx = (j*3 + 1)*3*4 //Cooedinata
+		shl			edx, 4				; edx = (j*3 +1)*4*4
+		;IMUL		edx, edx, 12		; edx = (j*3 + 1)*3*4 //Cooedinata
 
 		MOV				esi, [ebp+coords]
-		MOVUPS			XMM5, [mask]
+		;MOVUPS			XMM5, [mask]
 		; v[ix]
 		MOVUPS			XMM0, [esi+ecx]				; XMM0: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
-		ANDPS			XMM0, XMM5					; XMM0: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
+		;ANDPS			XMM0, XMM5					; XMM0: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		; v[jx]
 		MOVUPS			XMM1, [esi+edx]				; XMM1: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
-		ANDPS			XMM1, XMM5					; XMM1: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
+		;ANDPS			XMM1, XMM5					; XMM1: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 
 		; Distanza
 		dist			XMM0, XMM1
@@ -221,22 +223,24 @@ e_start_loop_j:
 		shl  		ecx, 1      		; ecx = i*2
 		add  		ecx, eax     		; ecx = i*3 (= i*2 + i)
 		add  		ecx, 1      		; ecx = i*3 + 1
-		IMUL		ecx, ecx, 12		; ecx = (i*3 + 1)*3*4 //Cooedinata
+		shl			ecx, 4				; ecx = (i*3 +1)*4*4
+		;IMUL		ecx, ecx, 12		; ecx = (i*3 + 1)*3*4 //Cooedinata
 		; jx
 		mov  		edx, ebx			; edx = j
 		shl  		edx, 1      		; edx = j*2
 		add  		edx, ebx     		; edx = j*3 (= j*2 + j)
 		add  		edx, 1      		; edx = j*3 + 1
-		IMUL		edx, edx, 12		; edx = (j*3 + 1)*3*4 //Cooedinata
+		shl			edx, 4				; edx = (j*3 +1)*4*4
+		;IMUL		edx, edx, 12		; edx = (j*3 + 1)*3*4 //Cooedinata
 
 		MOV				esi, [ebp+coords]
-		MOVUPS			XMM5, [mask]
+		;MOVUPS			XMM5, [mask]
 		; v[ix]
 		MOVUPS			XMM3, [esi+ecx]				; XMM3: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
-		ANDPS			XMM3, XMM5					; XMM3: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
+		;ANDPS			XMM3, XMM5					; XMM3: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		; v[jx]
 		MOVUPS			XMM4, [esi+edx]				; XMM4: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
-		ANDPS			XMM4, XMM5					; XMM4: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
+		;ANDPS			XMM4, XMM5					; XMM4: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 
 		; Distance
 		dist			XMM3, XMM4
@@ -332,22 +336,24 @@ h_start_loop_j:
 		shl  		ecx, 1      		; ecx = i*2
 		add  		ecx, eax     		; ecx = i*3 (= i*2 + i)
 		add  		ecx, 1      		; ecx = i*3 + 1
-		IMUL		ecx, ecx, 12		; ecx = (i*3 + 1)*3*4 //Cooedinata
+		shl			ecx, 4				; ecx = (i*3 +1)*4*4
+		;IMUL		ecx, ecx, 12		; ecx = (i*3 + 1)*3*4 //Cooedinata
 		; jx
 		mov  		edx, ebx			; edx = j
 		shl  		edx, 1      		; edx = j*2
 		add  		edx, ebx     		; edx = j*3 (= j*2 + j)
 		add  		edx, 1      		; edx = j*3 + 1
-		IMUL		edx, edx, 12		; edx = (j*3 + 1)*3*4 //Cooedinata
+		shl			edx, 4				; edx = (j*3 +1)*4*4
+		;IMUL		edx, edx, 12		; edx = (j*3 + 1)*3*4 //Cooedinata
 
 		MOV				esi, [ebp+coords]
-		MOVUPS			XMM5, [mask]
+		;MOVUPS			XMM5, [mask]
 		; v[ix]
 		MOVUPS			XMM2, [esi+ecx]				; XMM2: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
-		ANDPS			XMM2, XMM5					; XMM2: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
+		;ANDPS			XMM2, XMM5					; XMM2: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		; v[jx]
 		MOVUPS			XMM3, [esi+edx]				; XMM3: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
-		ANDPS			XMM3, XMM5					; XMM3: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
+		;ANDPS			XMM3, XMM5					; XMM3: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 
 		; Distance
 		dist			XMM2, XMM3

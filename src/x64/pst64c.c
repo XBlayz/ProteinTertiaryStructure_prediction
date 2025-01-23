@@ -376,17 +376,19 @@ MATRIX backbone(int n, VECTOR phi, VECTOR psi) {
 	//type THETA_N_CA_C = 1.940; (Non usati)
 
     // Allocazione matrice (vettore di vettori 3D) risultante
-	MATRIX coords = alloc_matrix(3, n*3);
+	MATRIX coords = alloc_matrix(4, n*3);
 
     // Posizionamento primo atomo backbone
 	coords[0] = 0.0;
 	coords[1] = 0.0;
 	coords[2] = 0.0;
+	coords[3] = 0.0; //* PADDING
 
     // Posizionamento secondo atomo backbone
-	coords[3] = R_CA_N;
-	coords[4] = 0.0;
+	coords[4] = R_CA_N;
 	coords[5] = 0.0;
+	coords[6] = 0.0;
+	coords[7] = 0.0; //* PADDING
 
 	// Alloco le variabili da usare
 	VECTOR v = alloc_matrix(3, 1);
@@ -400,9 +402,9 @@ MATRIX backbone(int n, VECTOR phi, VECTOR psi) {
 	for (int i = 0; i < n; i++) {
 		int idx = i*3;
 		if(i > 0) {
-			v[0] = coords[(idx-1)*3] - coords[(idx-2)*3];
-			v[1] = coords[(idx-1)*3+1] - coords[(idx-2)*3+1];
-			v[2] = coords[(idx-1)*3+2] - coords[(idx-2)*3+2];
+			v[0] = coords[(idx-1)*4] - coords[(idx-2)*4];
+			v[1] = coords[(idx-1)*4+1] - coords[(idx-2)*4+1];
+			v[2] = coords[(idx-1)*4+2] - coords[(idx-2)*4+2];
 			mod_v = modulo(v);
 			v[0] /= mod_v;
 			v[1] /= mod_v;
@@ -415,16 +417,17 @@ MATRIX backbone(int n, VECTOR phi, VECTOR psi) {
 			newv = prodotto_vet_mat(p, rot);
 			dealloc_matrix(rot);
 
-			coords[(idx)*3] = coords[(idx-1)*3] + newv[0];
-			coords[(idx)*3+1] = coords[(idx-1)*3+1] + newv[1];
-			coords[(idx)*3+2] = coords[(idx-1)*3+2] + newv[2];
+			coords[(idx)*4] = coords[(idx-1)*4] + newv[0];
+			coords[(idx)*4+1] = coords[(idx-1)*4+1] + newv[1];
+			coords[(idx)*4+2] = coords[(idx-1)*4+2] + newv[2];
+			coords[(idx)*4+3] = 0.0; //* PADDING
 			dealloc_matrix(newv);
 
 			// -----
 
-			v[0] = coords[(idx)*3] - coords[(idx-1)*3];
-			v[1] = coords[(idx)*3+1] - coords[(idx-1)*3+1];
-			v[2] = coords[(idx)*3+2] - coords[(idx-1)*3+2];
+			v[0] = coords[(idx)*4] - coords[(idx-1)*4];
+			v[1] = coords[(idx)*4+1] - coords[(idx-1)*4+1];
+			v[2] = coords[(idx)*4+2] - coords[(idx-1)*4+2];
 			mod_v = modulo(v);
 			v[0] /= mod_v;
 			v[1] /= mod_v;
@@ -437,14 +440,15 @@ MATRIX backbone(int n, VECTOR phi, VECTOR psi) {
 			newv = prodotto_vet_mat(p, rot);
 			dealloc_matrix(rot);
 
-			coords[(idx+1)*3] = coords[(idx)*3] + newv[0];
-			coords[(idx+1)*3+1] = coords[(idx)*3+1] + newv[1];
-			coords[(idx+1)*3+2] = coords[(idx)*3+2] + newv[2];
+			coords[(idx+1)*4] = coords[(idx)*4] + newv[0];
+			coords[(idx+1)*4+1] = coords[(idx)*4+1] + newv[1];
+			coords[(idx+1)*4+2] = coords[(idx)*4+2] + newv[2];
+			coords[(idx+1)*4+3] = 0.0; //* PADDING
 			dealloc_matrix(newv);
 		}
-		v[0] = coords[(idx+1)*3] - coords[(idx)*3];
-		v[1] = coords[(idx+1)*3+1] - coords[(idx)*3+1];
-		v[2] = coords[(idx+1)*3+2] - coords[(idx)*3+2];
+		v[0] = coords[(idx+1)*4] - coords[(idx)*4];
+		v[1] = coords[(idx+1)*4+1] - coords[(idx)*4+1];
+		v[2] = coords[(idx+1)*4+2] - coords[(idx)*4+2];
 		mod_v = modulo(v);
 		v[0] /= mod_v;
 		v[1] /= mod_v;
@@ -457,9 +461,10 @@ MATRIX backbone(int n, VECTOR phi, VECTOR psi) {
 		newv = prodotto_vet_mat(p, rot);
 		dealloc_matrix(rot);
 
-		coords[(idx+2)*3] = coords[(idx+1)*3] + newv[0];
-		coords[(idx+2)*3+1] = coords[(idx+1)*3+1] + newv[1];
-		coords[(idx+2)*3+2] = coords[(idx+1)*3+2] + newv[2];
+		coords[(idx+2)*4] = coords[(idx+1)*4] + newv[0];
+		coords[(idx+2)*4+1] = coords[(idx+1)*4+1] + newv[1];
+		coords[(idx+2)*4+2] = coords[(idx+1)*4+2] + newv[2];
+		coords[(idx+2)*4+3] = 0.0; //* PADDING
         dealloc_matrix(newv);
 	}
 

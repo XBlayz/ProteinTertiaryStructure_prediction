@@ -54,7 +54,7 @@ p_energy:
 		XOR 		R8, R8					; R8: i=0
 		VXORPD		XMM7, XMM7				; XMM7: | 0 | energy=0 |
 
-		MOV			R10, 3*8				; R10 = 3*8
+		MOV			R10, 4*8				; R10 = 4*8
 		VMOVSD		XMM4, [ten]
 start_loop_i:
 		; if (i < n)
@@ -75,19 +75,19 @@ start_loop_j:
 		MOV			RAX, 3					; RAX = 3
 		IMUL		RAX, R8					; RAX = i*3
 		ADD			RAX, 1					; RAX = i*3 + 1 //Atomo Ca
-		IMUL		RAX, R10				; RAX = (i*3 + 1)*3*8 //Coordinata
+		IMUL		RAX, R10				; RAX = (i*3 + 1)*4*8 //Coordinata
 		; jx
 		MOV			RCX, 3					; RCX = 3
 		IMUL		RCX, R9					; RCX = j*3
 		ADD			RCX, 1					; RCX = j*3 + 1 //Atomo Ca
-		IMUL		RCX, R10				; RCX = (j*3 + 1)*3*8 //Coordinata
+		IMUL		RCX, R10				; RCX = (j*3 + 1)*4*8 //Coordinata
 
 		; v[ix]
-		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- | v[(i*3 + 1)*3+3] | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
-		VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		;VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		; v[jx]
-		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- |v[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
-		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		;VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distanza
 		dist			YMM1, YMM2, XMM1, XMM2
@@ -157,7 +157,7 @@ e_energy:
 		XOR 		R9, R9					; R9: i=0
 		VXORPD		XMM0, XMM0				; XMM0: | 0 | energy=0 |
 
-		MOV			R11, 3*8				; R11 = 3*8
+		MOV			R11, 4*8				; R11 = 4*8
 		VMOVSD		XMM4, [ten]				; XMM4 = 10.0
 e_start_loop_i:
 		; if (i < n)
@@ -202,19 +202,19 @@ e_start_loop_j:
 		MOV			RAX, 3					; RAX = 3
 		IMUL		RAX, R9					; RAX = i*3
 		ADD			RAX, 1					; RAX = i*3 + 1 //Atomo Ca
-		IMUL		RAX, R11				; RAX = (i*3 + 1)*3*8 //Coordinata
+		IMUL		RAX, R11				; RAX = (i*3 + 1)*4*8 //Coordinata
 		; jx
 		MOV			RCX, 3					; RCX = 3
 		IMUL		RCX, R10				; RCX = j*3
 		ADD			RCX, 1					; RCX = j*3 + 1 //Atomo Ca
-		IMUL		RCX, R11				; RCX = (j*3 + 1)*3*8 //Coordinata
+		IMUL		RCX, R11				; RCX = (j*3 + 1)*4*8 //Coordinata
 
 		; v[ix]
-		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- | v[(i*3 + 1)*3+3] |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
-		VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- | 0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		;VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		; v[jx]
-		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | v[(j*3 + 1)*3+3] |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
-		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		;VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distance
 		dist			YMM1, YMM2, XMM1, XMM2
@@ -272,7 +272,7 @@ h_energy:
 		XOR 		R9, R9					; R9: i=0
 		VXORPD		XMM0, XMM0				; XMM0: | 0 | energy=0 |
 
-		MOV			R11, 3*8				; R11 = 3*8
+		MOV			R11, 4*8				; R11 = 4*8
 		VMOVSD		XMM4, [ten]				; XMM4 = 10.0
 h_start_loop_i:
 		; if (i < n)
@@ -302,19 +302,19 @@ h_start_loop_j:
 		MOV			RAX, 3					; RAX = 3
 		IMUL		RAX, R9					; RAX = i*3
 		ADD			RAX, 1					; RAX = i*3 + 1 //Atomo Ca
-		IMUL		RAX, R11				; RAX = (i*3 + 1)*3*8 //Coordinata
+		IMUL		RAX, R11				; RAX = (i*3 + 1)*4*8 //Coordinata
 		; jx
 		MOV			RCX, 3					; RCX = 3
 		IMUL		RCX, R10				; RCX = j*3
 		ADD			RCX, 1					; RCX = j*3 + 1 //Atomo Ca
-		IMUL		RCX, R11				; RCX = (j*3 + 1)*3*8 //Coordinata
+		IMUL		RCX, R11				; RCX = (j*3 + 1)*4*8 //Coordinata
 
 		; v[ix]
-		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- | v[(i*3 + 1)*3+3] |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
-		VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- |0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		;VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		; v[jx]
-		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | v[(j*3 + 1)*3+3] |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
-		VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		;VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distance
 		dist			YMM1, YMM2, XMM1, XMM2
