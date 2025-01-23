@@ -10,7 +10,8 @@ pst32
 pst32_debug
 v64
 v32
-prova
+pst_OpenMP_64
+vOpenMP_64
 
 build/
 .vscode/
