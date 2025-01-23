@@ -503,16 +503,16 @@ type dist(VECTOR i, VECTOR j) {
 }
 
 // -MAIN-
-//extern void h_energy(char* s, int n, MATRIX coords, type* e, type* h);
+extern void h_energy(char* s, int n, MATRIX coords, type* e, type* h);
 
 type hydrophobic_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
 
 	//* ASSEMBLY
-	//h_energy(s, n, coords, &energy, hydrophobicity);
+	h_energy(s, n, coords, &energy, hydrophobicity);
 
 	//* C
-	for(int i = 0; i<n; i++) {
+	/* for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
 			// Indicizzazione atomi Ca [(i*3)+1]
@@ -533,22 +533,22 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 				energy += (hydrophobicity[s[i]-'A'] * hydrophobicity[s[j]-'A']) / d;
 			}
 		}
-	}
+	} */
 	return energy;
 }
 
 // --ELECTROSTATIC-ENERGY--
 // -MAIN-
-//extern void e_energy(char* s, int n, MATRIX coords, type* e, type* c);
+extern void e_energy(char* s, int n, MATRIX coords, type* e, type* c);
 
 type electrostatic_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
 
 	//* ASSEMBLY
-	//e_energy(s, n, coords, &energy, charge);
+	e_energy(s, n, coords, &energy, charge);
 
 	//* C
-	for(int i = 0; i<n; i++) {
+	/* for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
 			// Indicizzazione atomi Ca [(i*3)+1]
@@ -569,7 +569,7 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 				energy += (charge[s[i]-'A'] * charge[s[j]-'A']) / (d*4.0);
 			}
 		}
-	}
+	} */
 	return energy;
 }
 
@@ -581,11 +581,10 @@ type packing_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
 
 	//* ASSEMBLY
-	type energy_assembly = 0;
-	p_energy(s, n, coords, &energy_assembly, volume);
+	p_energy(s, n, coords, &energy, volume);
 
 	//* C
-	for(int i = 0; i<n; i++) {
+	/* for(int i = 0; i<n; i++) {
 		type density = 0;
 		for(int j = 0; j<n; j++) {
 			VECTOR vi = alloc_matrix(3, 1);
@@ -610,8 +609,7 @@ type packing_energy(char* s, int n, MATRIX coords) {
 		// Calcolo energia
 		type tmp = volume[s[i]-'A'] - density;
 		energy += tmp*tmp;
-	}
-	printf("C: %f | ASS: %f\n", energy, energy_assembly);
+	} */
 	return energy;
 }
 
