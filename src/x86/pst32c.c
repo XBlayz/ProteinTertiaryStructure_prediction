@@ -95,7 +95,7 @@ typedef struct {
 */
 
 void* get_block(int size, int elements) {
-	return _mm_malloc(elements*size,32);
+	return _mm_malloc(elements*size,16);
 }
 
 void free_block(void* p) {
@@ -286,7 +286,6 @@ extern void prova(params* input);
 // -UTILITY-
 type modulo(VECTOR v) {
     // Modulo di un vettore 3D
-	type r = 0;
 	return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 

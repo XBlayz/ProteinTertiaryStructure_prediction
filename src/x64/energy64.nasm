@@ -83,10 +83,10 @@ start_loop_j:
 		IMUL		RCX, R10				; RCX = (j*3 + 1)*4*8 //Coordinata
 
 		; v[ix]
-		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VMOVAPD			YMM1, [RDX+RAX]				; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		;VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		; v[jx]
-		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VMOVAPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 		;VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distanza
@@ -210,10 +210,10 @@ e_start_loop_j:
 		IMUL		RCX, R11				; RCX = (j*3 + 1)*4*8 //Coordinata
 
 		; v[ix]
-		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- | 0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VMOVAPD			YMM1, [RDX+RAX]				; YMM1 <- | 0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		;VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		; v[jx]
-		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VMOVAPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 		;VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distance
@@ -310,10 +310,10 @@ h_start_loop_j:
 		IMUL		RCX, R11				; RCX = (j*3 + 1)*4*8 //Coordinata
 
 		; v[ix]
-		VMOVUPD			YMM1, [RDX+RAX]				; YMM1 <- |0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
+		VMOVAPD			YMM1, [RDX+RAX]				; YMM1 <- |0 |v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		;VANDPD			YMM1, YMM1, [mask]			; YMM1 <- | 0 | v[(i*3 + 1)*3+2] | v[(i*3 + 1)*3+1] | v[(i*3 + 1)*3] |
 		; v[jx]
-		VMOVUPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
+		VMOVAPD			YMM2, [RDX+RCX]				; YMM2 <- | 0 |v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 		;VANDPD			YMM2, YMM2, [mask]			; YMM2 <- | 0 | v[(j*3 + 1)*3+2] | v[(j*3 + 1)*3+1] | v[(j*3 + 1)*3] |
 
 		; Distance

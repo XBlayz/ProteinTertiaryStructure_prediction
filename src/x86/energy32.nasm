@@ -89,10 +89,10 @@ p_start_loop_j:
 		MOV				esi, [ebp+coords]
 		;MOVUPS			XMM5, [mask]
 		; v[ix]
-		MOVUPS			XMM0, [esi+ecx]				; XMM0: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
+		MOVAPS			XMM0, [esi+ecx]				; XMM0: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		;ANDPS			XMM0, XMM5					; XMM0: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		; v[jx]
-		MOVUPS			XMM1, [esi+edx]				; XMM1: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
+		MOVAPS			XMM1, [esi+edx]				; XMM1: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 		;ANDPS			XMM1, XMM5					; XMM1: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 
 		; Distanza
@@ -235,10 +235,10 @@ e_start_loop_j:
 		MOV				esi, [ebp+coords]
 		;MOVUPS			XMM5, [mask]
 		; v[ix]
-		MOVUPS			XMM3, [esi+ecx]				; XMM3: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
+		MOVAPS			XMM3, [esi+ecx]				; XMM3: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		;ANDPS			XMM3, XMM5					; XMM3: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		; v[jx]
-		MOVUPS			XMM4, [esi+edx]				; XMM4: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
+		MOVAPS			XMM4, [esi+edx]				; XMM4: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 		;ANDPS			XMM4, XMM5					; XMM4: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 
 		; Distance
@@ -348,10 +348,10 @@ h_start_loop_j:
 		MOV				esi, [ebp+coords]
 		;MOVUPS			XMM5, [mask]
 		; v[ix]
-		MOVUPS			XMM2, [esi+ecx]				; XMM2: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
+		MOVAPS			XMM2, [esi+ecx]				; XMM2: |[(i*3 + 1)*3+3]|v[(i*3 + 1)*3+1+2]|[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		;ANDPS			XMM2, XMM5					; XMM2: |0|v[(i*3 + 1)*3+1+2]|v[(i*3 + 1)*3+1]|v[(i*3 + 1)*3]|
 		; v[jx]
-		MOVUPS			XMM3, [esi+edx]				; XMM3: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
+		MOVAPS			XMM3, [esi+edx]				; XMM3: |[(j*3 + 1)*3+3]|v[(j*3 + 1)*3+1+2]|[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 		;ANDPS			XMM3, XMM5					; XMM3: |0|v[(j*3 + 1)*3+1+2]|v[(j*3 + 1)*3+1]|v[(j*3 + 1)*3]|
 
 		; Distance
