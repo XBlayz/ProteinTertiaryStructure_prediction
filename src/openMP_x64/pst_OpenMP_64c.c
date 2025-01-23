@@ -503,6 +503,8 @@ type dist(VECTOR i, VECTOR j) {
 	return r;
 }
 
+extern void fn_energy(MATRIX coords, int ix, int jx, type* d);
+
 // -MAIN-
 type hydrophobic_energy(char* s, int n, MATRIX coords) {
 	type energy = 0;
@@ -511,19 +513,21 @@ type hydrophobic_energy(char* s, int n, MATRIX coords) {
 	#pragma omp parallel for reduction(+:energy)
 	for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
-			VECTOR vi = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(i*3)+1]
-			vi[0] = coords[((i*3)+1)*3];
-			vi[1] = coords[((i*3)+1)*3+1];
-			vi[2] = coords[((i*3)+1)*3+2];
-			VECTOR vj = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(i*3)+1]
-			vj[0] = coords[((j*3)+1)*3];
-			vj[1] = coords[((j*3)+1)*3+1];
-			vj[2] = coords[((j*3)+1)*3+2];
-			type d = dist(vi, vj);
-			dealloc_matrix(vi);
-			dealloc_matrix(vj);
+			type d = 0;
+			fn_energy(coords, ((i*3)+1)*3, ((j*3)+1)*3, &d);
+			//VECTOR vi = alloc_matrix(3, 1);
+			//// Indicizzazione atomi Ca [(i*3)+1]
+			//vi[0] = coords[((i*3)+1)*3];
+			//vi[1] = coords[((i*3)+1)*3+1];
+			//vi[2] = coords[((i*3)+1)*3+2];
+			//VECTOR vj = alloc_matrix(3, 1);
+			//// Indicizzazione atomi Ca [(i*3)+1]
+			//vj[0] = coords[((j*3)+1)*3];
+			//vj[1] = coords[((j*3)+1)*3+1];
+			//vj[2] = coords[((j*3)+1)*3+2];
+			//type d = dist(vi, vj);
+			//dealloc_matrix(vi);
+			//dealloc_matrix(vj);
 
 			if(d < 10.0) {
 				// Calcolo energia
@@ -544,20 +548,21 @@ type electrostatic_energy(char* s, int n, MATRIX coords) {
 	for(int i = 0; i<n; i++) {
 		for(int j = i+1; j<n; j++) {
 			if(i == j) continue;
-
-			VECTOR vi = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(i*3)+1]
-			vi[0] = coords[((i*3)+1)*3];
-			vi[1] = coords[((i*3)+1)*3+1];
-			vi[2] = coords[((i*3)+1)*3+2];
-			VECTOR vj = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(i*3)+1]
-			vj[0] = coords[((j*3)+1)*3];
-			vj[1] = coords[((j*3)+1)*3+1];
-			vj[2] = coords[((j*3)+1)*3+2];
-			type d = dist(vi, vj);
-			dealloc_matrix(vi);
-			dealloc_matrix(vj);
+			type d = 0;
+			fn_energy(coords, ((i*3)+1)*3, ((j*3)+1)*3, &d);
+			//VECTOR vi = alloc_matrix(3, 1);
+			//// Indicizzazione atomi Ca [(i*3)+1]
+			//vi[0] = coords[((i*3)+1)*3];
+			//vi[1] = coords[((i*3)+1)*3+1];
+			//vi[2] = coords[((i*3)+1)*3+2];
+			//VECTOR vj = alloc_matrix(3, 1);
+			//// Indicizzazione atomi Ca [(i*3)+1]
+			//vj[0] = coords[((j*3)+1)*3];
+			//vj[1] = coords[((j*3)+1)*3+1];
+			//vj[2] = coords[((j*3)+1)*3+2];
+			//type d = dist(vi, vj);
+			//dealloc_matrix(vi);
+			//dealloc_matrix(vj);
 
 			if(d < 10.0 && charge[s[i]-'A'] != 0 && charge[s[j]-'A'] != 0) {
 				// Calcolo energia
@@ -581,20 +586,21 @@ type packing_energy(char* s, int n, MATRIX coords) {
 		#pragma omp parallel for reduction(+:density)
 		for(int j = 0; j<n; j++) {
 			if(i == j) continue;
-
-			VECTOR vi = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(i*3)+1]
-			vi[0] = coords[((i*3)+1)*3];
-			vi[1] = coords[((i*3)+1)*3+1];
-			vi[2] = coords[((i*3)+1)*3+2];
-			VECTOR vj = alloc_matrix(3, 1);
-			// Indicizzazione atomi Ca [(j*3)+1]
-			vj[0] = coords[((j*3)+1)*3];
-			vj[1] = coords[((j*3)+1)*3+1];
-			vj[2] = coords[((j*3)+1)*3+2];
-			type d = dist(vi, vj);
-			dealloc_matrix(vi);
-			dealloc_matrix(vj);
+			type d = 0;
+			fn_energy(coords, ((i*3)+1)*3, ((j*3)+1)*3, &d);
+			//VECTOR vi = alloc_matrix(3, 1);
+			//// Indicizzazione atomi Ca [(i*3)+1]
+			//vi[0] = coords[((i*3)+1)*3];
+			//vi[1] = coords[((i*3)+1)*3+1];
+			//vi[2] = coords[((i*3)+1)*3+2];
+			//VECTOR vj = alloc_matrix(3, 1);
+			//// Indicizzazione atomi Ca [(j*3)+1]
+			//vj[0] = coords[((j*3)+1)*3];
+			//vj[1] = coords[((j*3)+1)*3+1];
+			//vj[2] = coords[((j*3)+1)*3+2];
+			//type d = dist(vi, vj);
+			//dealloc_matrix(vi);
+			//dealloc_matrix(vj);
 
 			if(d < 10.0) {
 				// Calcolo densità
